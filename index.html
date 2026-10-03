@@ -80,6 +80,22 @@ body.dialog-open .cursor{display:none}
 @media (pointer:coarse){.cursor{display:none!important}html.cursor-on,html.cursor-on *{cursor:auto!important}}
 @media (prefers-reduced-motion:reduce){.cursor{transition:opacity .2s linear}}
 
+/* ---------- SCROLL PROGRESS ---------- */
+.section{border-top:0!important}
+.snake-rule{position:absolute;left:0;right:0;top:-7px;height:14px;overflow:hidden;pointer-events:none}
+.snake-rule svg{display:block;animation:srSlide 7s linear infinite}
+.sr-body{fill:none;stroke:rgba(255,255,255,.13);stroke-width:1.2}
+.sr-pulse{fill:none;stroke:var(--accent);stroke-width:1.7;stroke-linecap:round;stroke-dasharray:90 2400;animation:srPulse 9s linear infinite;filter:drop-shadow(0 0 4px rgba(230,64,47,.85))}
+@keyframes srSlide{to{transform:translateX(-160px)}}
+@keyframes srPulse{from{stroke-dashoffset:300}to{stroke-dashoffset:-2190}}
+.cursor-snake{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:9998}
+.ouro{width:20px;height:20px;margin-right:10px;vertical-align:-5px;animation:ouroSpin 14s linear infinite}
+@keyframes ouroSpin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.snake-rule svg,.sr-pulse,.ouro{animation:none}}
+.snakebar{position:fixed;left:0;top:0;width:24px;height:100vh;z-index:120;pointer-events:none}
+html{scrollbar-width:none;-ms-overflow-style:none}html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
+.scrollbar-fill{position:absolute;left:0;top:0;right:0;height:100%;background:linear-gradient(180deg,var(--accent-muted),var(--accent));transform-origin:top;transform:scaleY(0)}
+.scrollbar-head{position:absolute;left:-3px;width:9px;height:9px;margin-top:-5px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(230,64,47,.55),0 0 18px 4px rgba(230,64,47,.7);top:0}
 /* ---------- NAV ---------- */
 .nav{
   position:fixed;top:0;left:0;right:0;z-index:100;
@@ -126,26 +142,36 @@ body.dialog-open .cursor{display:none}
   position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:center;
   padding:140px clamp(20px,6vw,80px) 110px;overflow:hidden;
 }
-.hero-bgstage{position:absolute;inset:0;z-index:0;overflow:hidden;background:#050506}
-.hero-bg-slide{
-  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;
-  filter:grayscale(.45) brightness(.82) contrast(1.0) saturate(.9);
-  opacity:0;transform:scale(1.1);
-  transition:opacity 1.8s var(--ease-soft);
-  animation:heroKen 18s linear infinite;
+.hero{background:radial-gradient(ellipse 40% 55% at 74% 52%,rgba(230,64,47,.12),transparent 70%),radial-gradient(ellipse 30% 40% at 12% 90%,rgba(230,64,47,.06),transparent 70%),var(--canvas)}
+.hero-stage{position:absolute;inset:0;z-index:0;outline:none;touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none}
+.hero-stage.grabbing{cursor:grabbing}
+.hero-stage canvas{width:100%;height:100%;display:block}
+.hero-stage:focus-visible{outline:2px solid var(--accent);outline-offset:-6px}
+.hero-words{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden}
+.hero-word{
+  position:absolute;font-family:var(--font-display);font-weight:600;font-size:clamp(1.3rem,2.8vw,2.4rem);
+  color:#fff;white-space:nowrap;letter-spacing:-.01em;mix-blend-mode:difference;will-change:transform,opacity;
 }
-.hero-bg-slide.is-active{opacity:1}
-@keyframes heroKen{0%{transform:scale(1.1) translate3d(0,0,0)}100%{transform:scale(1.22) translate3d(-1.4%,-1.2%,0)}}
-.hero-scrim{
-  position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(180deg,rgba(5,5,7,.42) 0%,rgba(5,5,7,.58) 46%,rgba(5,5,7,.94) 100%);
-}
-@media (prefers-reduced-motion:reduce){.hero-bg-slide{animation:none;transform:scale(1.1)}}
-.plus-mark{
+.strip{--k:1;padding:clamp(60px,10vh,120px) 0 clamp(50px,8vh,90px);border-top:1px solid var(--line-soft);overflow:hidden;position:relative}
+.strip-track{display:flex;align-items:flex-start;gap:14px;width:max-content;animation:stripRun 80s linear infinite}
+.strip:hover .strip-track{animation-play-state:paused}
+.strip-track img{display:block;width:calc(var(--w)*1px*var(--k));height:calc(var(--h)*1px*var(--k));border-radius:14px;object-fit:cover;filter:grayscale(1) contrast(1.08) brightness(.9);transition:filter .6s var(--ease-soft)}
+.strip-track img:hover{filter:none}
+@keyframes stripRun{to{transform:translateX(-50%)}}
+.strip-text{max-width:62ch;margin:clamp(48px,8vh,90px) auto 0;padding:0 24px;text-align:center;font-size:clamp(1rem,1.5vw,1.18rem);line-height:1.5;color:var(--text-primary)}
+@media (max-width:760px){.strip{--k:.62}}
+@media (prefers-reduced-motion:reduce){.strip-track{animation:none}.strip{overflow-x:auto}}
+.hero-contact{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.03em;color:var(--text-secondary);margin:1.2rem 0 0}
+.hero-contact a{color:var(--text-primary);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.25)}
+.hero-contact a:hover{border-color:var(--accent)}
+.hero-hint{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.06em;color:var(--text-secondary);margin:1.6rem 0 0;transition:opacity .6s var(--ease-soft)}
+.hero-hint.used{opacity:.35}
+@media (min-width:861px){.hero-inner{max-width:620px}}.plus-mark{
   position:absolute;top:100px;right:clamp(20px,6vw,80px);z-index:1;
   color:var(--accent);font-size:1.4rem;line-height:1;font-family:var(--font-mono);
 }
-.hero-inner{position:relative;z-index:1;max-width:920px}
+.hero-inner{position:relative;z-index:1;max-width:920px;pointer-events:none;user-select:none;-webkit-user-select:none;mix-blend-mode:difference}
+.hero-inner a,.hero-inner button{pointer-events:auto}
 .hero-kicker{
   font-family:var(--font-mono);font-size:.82rem;letter-spacing:.03em;color:var(--text-secondary);
   margin:0 0 1.7rem;
@@ -167,6 +193,7 @@ body.dialog-open .cursor{display:none}
 .hero-copy{font-size:clamp(1rem,1.6vw,1.12rem);color:var(--text-secondary);max-width:58ch;margin:0 0 2.3rem}
 .hero-copy strong{color:var(--text-primary);font-weight:600}
 .hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+.hero-cta.cta-row{justify-content:flex-start}
 .hero-scroll{
   position:absolute;left:clamp(20px,6vw,80px);bottom:40px;z-index:1;
   display:flex;align-items:center;gap:10px;font-family:var(--font-mono);font-size:.72rem;
@@ -200,18 +227,21 @@ body.dialog-open .cursor{display:none}
 
 /* ---------- PARTNERS ---------- */
 .brand-row{
-  display:grid;grid-template-columns:repeat(8,1fr);margin-top:2.6rem;
-  border-top:1px solid var(--line);border-left:1px solid var(--line);
+  margin-top:2.6rem;display:flex;flex-direction:column;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);
 }
-@media (max-width:1000px){.brand-row{grid-template-columns:repeat(4,1fr)}}
-@media (max-width:520px){.brand-row{grid-template-columns:repeat(2,1fr)}}
-.brand-row > span{
-  display:flex;align-items:center;justify-content:center;height:96px;padding:0 14px;
-  border-right:1px solid var(--line);border-bottom:1px solid var(--line);
-  transition:background .3s var(--ease-soft);
+.brand-track{display:flex;width:max-content;animation:brandMarq 70s linear infinite}
+.brand-track + .brand-track{border-top:1px solid var(--line);animation-direction:reverse;animation-duration:80s}
+.brand-row:hover .brand-track{animation-play-state:paused}
+@keyframes brandMarq{to{transform:translateX(-50%)}}
+.brand-track > span{
+  flex:none;width:clamp(150px,15vw,200px);display:flex;align-items:center;justify-content:center;height:96px;padding:0 18px;
+  border-right:1px solid var(--line);transition:background .3s var(--ease-soft);
 }
-.brand-row > span:hover{background:rgba(255,255,255,.03)}
-.brand-mark{
+.brand-track > span:hover{background:rgba(255,255,255,.04)}
+@media (prefers-reduced-motion:reduce){.brand-track{animation:none;flex-wrap:wrap;width:auto}}.brand-mark{
   max-height:28px;max-width:82%;width:auto;height:auto;display:block;object-fit:contain;
   filter:grayscale(1) invert(1) brightness(1.6) contrast(1.3);
   opacity:.62;transition:opacity .3s var(--ease-soft),transform .3s var(--ease-soft);
@@ -263,11 +293,22 @@ h2.section-title{
 .reveal.from-top.in{transform:translateY(0)}
 
 /* ---------- STATS ---------- */
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
-@media (max-width:760px){.stats-grid{grid-template-columns:1fr 1fr}}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+@media (max-width:760px){.stats-grid{grid-template-columns:1fr}}
 .stat{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:clamp(24px,3vw,34px) clamp(18px,2.4vw,26px)}
 .stat-num{display:block;font-family:var(--font-display);font-weight:600;font-size:clamp(2.6rem,5.2vw,4rem);line-height:1;color:var(--text-primary)}
 .stat-num .suffix{color:var(--accent)}
+.odo{display:inline-flex;align-items:flex-start;line-height:1;height:1em;overflow:visible}
+.odo-d{display:inline-block;height:1em;overflow:hidden;position:relative}
+.odo-strip{display:flex;flex-direction:column;transition:transform 1.6s cubic-bezier(.18,.9,.12,1)}
+.odo-strip span{display:block;height:1em;line-height:1em;text-align:center}
+.odo.instant .odo-strip{transition:none}
+.odo-sep{display:inline-block}
+.odo-suffix{display:inline-block;color:var(--accent);transform:scale(0) rotate(-90deg);transition:transform .5s cubic-bezier(.3,1.6,.5,1)}
+.odo.done .odo-suffix{transform:none}
+.stat{position:relative;overflow:hidden}
+.stat::after{content:"";position:absolute;left:0;bottom:0;height:2px;width:100%;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform 1.4s var(--ease) .2s}
+.stat:has(.odo.done)::after{transform:scaleX(1)}
 .stat-label{display:block;margin-top:.7rem;font-family:var(--font-mono);font-size:.78rem;color:var(--text-secondary)}
 .stat-label::before{content:"("}
 .stat-label::after{content:")"}
@@ -326,22 +367,18 @@ h2.section-title{
 .tools-grid p{margin:0;color:var(--text-primary);font-size:.98rem}
 
 /* ---------- WORK CARDS ---------- */
-.work-cards{display:flex;flex-direction:column}
-.work-cards article{
-  position:sticky;background:var(--canvas);padding-bottom:clamp(36px,5vw,56px);
-}
-.work-cards article{top:84px}
-.work-cards article:nth-child(1){z-index:1}
-.work-cards article:nth-child(2){z-index:2}
-.work-cards article:nth-child(3){z-index:3}
-.work-cards article:nth-child(4){z-index:4}
-.work-cards article:nth-child(5){z-index:5}
-.work-cards article:nth-child(6){z-index:6}
-.work-cards article:nth-child(7){z-index:7}
+.work-cards{display:block;padding-bottom:4vh}
+/* layered deck: each card pins as you scroll and the next slides up over it */
+.work-cards article{position:sticky;top:calc(92px + var(--i,0)*16px);margin:0 0 9vh;transform-origin:50% 0}
+.work-cards article:last-child{margin-bottom:0}
+.work-cards .work-card-btn{box-sizing:border-box;background:#0d0d10;border:1px solid var(--line);border-radius:28px;padding:clamp(20px,3vw,40px);box-shadow:0 -24px 60px rgba(0,0,0,.55);transition:border-color .4s var(--ease-soft)}
+.work-cards .work-card-btn:hover{border-color:rgba(230,64,47,.45)}
+@media (max-width:780px){.work-cards article{top:calc(76px + var(--i,0)*10px)}}
 .work-card-btn{
   all:unset;display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(24px,4vw,56px);
   align-items:center;width:100%;cursor:pointer;color:var(--text-primary);
 }
+@media (min-width:781px){.work-cards article:nth-child(even) .work-card-btn{grid-template-columns:1.15fr .85fr}.work-cards article:nth-child(even) .work-card-media{order:2}}
 @media (max-width:780px){.work-card-btn{grid-template-columns:1fr}}
 .work-card-media{position:relative;display:block;border-radius:16px;overflow:hidden;aspect-ratio:4/3;background:var(--panel)}
 .work-card-media img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.92);transition:transform .8s var(--ease-soft),filter .5s var(--ease-soft)}
@@ -383,7 +420,14 @@ h2.section-title{
 .stat-panel-label{font-size:1rem;color:var(--text-secondary);max-width:26ch}
 .stat-panel-row{margin-top:.8rem;font-family:var(--font-mono);font-size:.74rem;color:var(--accent);letter-spacing:.03em}
 .work-card-media.stat-panel .work-card-view{left:auto;right:20px;top:auto;bottom:20px;transform:none}
-.work-card-btn:hover .work-card-media.stat-panel .work-card-view{transform:scale(1.06)}.work-card-tagline{font-size:1.06rem;font-style:italic;color:var(--text-secondary);max-width:40ch;line-height:1.45}
+.work-card-btn:hover .work-card-media.stat-panel .work-card-view{transform:scale(1.06)}
+.work-card-badge{
+  position:absolute;left:16px;top:16px;z-index:1;padding:7px 12px;border-radius:999px;
+  background:rgba(10,10,12,.78);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  font-family:var(--font-mono);font-size:.72rem;letter-spacing:.04em;color:#fff;
+}
+.work-card-badge b{color:var(--accent);font-weight:500}
+.work-card-tagline{font-size:1.06rem;font-style:italic;color:var(--text-secondary);max-width:40ch;line-height:1.45}
 
 /* ---------- EVENT DIALOG ---------- */
 dialog#eventDialog{
@@ -419,6 +463,37 @@ dialog#eventDialog::backdrop{background:rgba(3,3,6,.82);-webkit-backdrop-filter:
 .gallery figure{margin:0 0 12px;break-inside:avoid;border-radius:10px;overflow:hidden;background:var(--panel)}
 .gallery img{width:100%;height:auto;display:block}
 
+/* ---------- INTERACTIVE MOMENT ---------- */
+.focus-section{
+  background:var(--canvas);color:var(--text-primary);
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:28px;overflow:hidden;
+}
+.focus-rig{position:relative;width:220px;height:220px;display:flex;align-items:center;justify-content:center}
+/* slim strip: one line, title left, button and result right */
+.focus-section{flex-direction:row;flex-wrap:wrap;justify-content:center;text-align:left;gap:clamp(18px,3vw,40px);padding-top:clamp(36px,6vh,60px)!important;padding-bottom:clamp(36px,6vh,60px)!important}
+.focus-section .kicker{margin:0}
+.focus-section .section-title{font-size:clamp(1.2rem,2.2vw,1.7rem)!important;margin:0}
+.focus-section .focus-rig{display:flex;width:190px;height:190px;flex:0 0 auto}
+.focus-section .focus-rig svg{position:absolute;inset:0}
+.focus-section .focus-hold{width:92px;height:92px;font-size:.62rem}
+.focus-section .focus-result{font-size:clamp(1.1rem,2vw,1.5rem);min-width:7em}
+.focus-rig svg{width:100%;height:100%}
+.focus-hold{
+  position:relative;width:120px;height:120px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.02);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  font-family:var(--font-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text-secondary);user-select:none;-webkit-user-select:none;touch-action:none;
+}
+.focus-hold .ring-progress{position:absolute;inset:0;transform:rotate(-90deg)}
+.focus-hold .ring-progress circle{transition:stroke-dashoffset .05s linear}
+.focus-result{
+  font-family:var(--font-display);font-weight:600;font-size:clamp(1.4rem,3vw,2rem);
+  min-height:1.6em;color:var(--text-primary);opacity:0;transform:translateY(8px);
+  transition:opacity .5s var(--ease-soft),transform .5s var(--ease-soft);
+}
+.focus-result.shown{opacity:1;transform:translateY(0)}
+.spark{position:fixed;width:7px;height:7px;border-radius:50%;background:var(--accent);pointer-events:none;z-index:50}
 /* ---------- TRUST ---------- */
 .qa-grid{display:grid;gap:0;border-top:1px solid var(--line)}
 .qa-item{border-bottom:1px solid var(--line);padding:26px 0}
@@ -471,11 +546,12 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
 </head>
 <body>
 <a href="#main" class="skip-link">Skip to content</a>
+<canvas class="snakebar" id="snakeBar" aria-hidden="true"></canvas>
 <div class="cursor" id="cursor" aria-hidden="true"><span class="cursor-label" id="cursorLabel"></span></div>
 
 <nav class="nav">
   <div class="nav-pill">
-    <span class="nav-name">Abdelrahman Gawish</span>
+    <span class="nav-name"><svg class="ouro" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="ouroG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1f2f5"/><stop offset="1" stop-color="#7d8088"/></linearGradient></defs><circle cx="12" cy="12" r="8" fill="none" stroke="url(#ouroG)" stroke-width="2.6" stroke-dasharray="43 7.3" stroke-linecap="round"/><circle cx="17.66" cy="6.34" r="2.4" fill="#e9eaee"/><circle cx="18.4" cy="5.8" r="0.85" fill="#e6402f"/></svg>Abdelrahman Gawish</span>
     <div class="nav-right">
       <div class="nav-links">
         <a href="#work">Work</a>
@@ -490,24 +566,18 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
 </nav>
 
 <section class="hero" id="hero" aria-label="Introduction">
-  <div class="hero-bgstage" id="heroBg" aria-hidden="true">
-    <img class="hero-bg-slide is-active" src="assets/events/russia/cover.jpg" alt="">
-    <img class="hero-bg-slide" src="assets/events/worldcup/cover.jpg" alt="">
-    <img class="hero-bg-slide" src="assets/events/sohour/cover.jpg" alt="">
-    <img class="hero-bg-slide" src="assets/events/northcoast/cover.jpg" alt="">
-    <img class="hero-bg-slide" src="assets/events/padel/cover.jpg" alt="">
-    <img class="hero-bg-slide" src="assets/events/ignite/cover.jpg" alt="">
-    <div class="hero-scrim"></div>
-  </div>
+  <div class="hero-stage" id="heroStage" role="img" tabindex="0" aria-label="A silver ouroboros, a snake looped into a knot biting its own tail, surrounded by drifting particles. Drag to turn it." data-cursor="DRAG"><canvas id="heroCanvas"></canvas></div>
   <span class="plus-mark" aria-hidden="true">+</span>
   <div class="hero-inner">
     <p class="hero-kicker">Abdelrahman Gawish &middot; Cairo</p>
     <h1 class="hero-title"><span class="split-words">Event &amp; Marketing Coordinator.</span></h1>
-    <p class="hero-sub">UN-Habitat World Urban Forum &middot; a 25,000-registration national tech summit &middot; 25+ exhibitions.</p>
+    <p class="hero-sub">I've worked the floor at a 37,000-person UN forum and Egypt's national tech summit (25,000+ registrations), and run 100+ partner events for global tech brands.</p>
     <div class="hero-cta cta-row">
       <a class="btn" href="#work" data-cursor="VIEW">View work <i>&rarr;</i></a>
-      <a class="btn ghost" href="assets/Abdelrahman-Gawish-CV.pdf" download data-cursor="CV">Download CV <i>&darr;</i></a>
+      <a class="btn ghost" href="assets/Abdelrahman-Gawish-CV.pdf" download data-cursor="CV">Download CV <svg class="btn-ico" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 2v9M3.5 7.5 8 12l4.5-4.5M3 14h10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
     </div>
+    <p class="hero-contact"><a href="mailto:abdelrahmangawish03@gmail.com">abdelrahmangawish03@gmail.com</a> &middot; <a href="tel:+201123263925">+20 112 326 3925</a></p>
+    <p class="hero-hint" id="heroHint">(Drag the snake. It doesn't bite.)</p>
   </div>
   <div class="hero-scroll" aria-hidden="true">
     <span>Scroll</span>
@@ -521,19 +591,19 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
   <section class="section" id="trust">
     <div class="section-inner">
       <p class="kicker">What I bring</p>
-      <h2 class="section-title">Three things from the work so far.</h2>
+      <h2 class="section-title">The short version.</h2>
       <div class="qa-grid">
         <div class="qa-item reveal">
-          <h3>I've run rooms with real stakes.</h3>
-          <p>At the World Urban Forum (UN-Habitat, 2024), I trained and supervised a team of over 400 ushers and directed the Press Conference Hall, the venue for announcements from presidents, ambassadors, and senior UN officials, under strict international protocol. That's the bar I hold every event to since.</p>
+          <h3>Big rooms don't rattle me.</h3>
+          <p>A press hall at a 37,000-person UN forum. Three days of a national summit with 300+ speakers and 80+ exhibitors. I've run the floor when it counted.</p>
         </div>
         <div class="qa-item reveal" style="transition-delay:.08s">
           <h3>Marketing and the room, same person.</h3>
-          <p>I write the campaign, build the email send, design the booth, and I'm still on-site when the first guest walks in. One person owning the full line from brief to room means fewer handoffs and fewer gaps for things to fall through.</p>
+          <p>I write the campaign and design the booth, then I'm the one at the door when guests walk in. Fewer handoffs, fewer things falling through.</p>
         </div>
         <div class="qa-item reveal" style="transition-delay:.16s">
-          <h3>I can pilot something from zero.</h3>
-          <p>Ignite &amp; Accelerate was the first run of that format, and I was the one piloting it: a blank page to a clear success, proof a new idea can work on the first try.</p>
+          <h3>I can launch something from zero.</h3>
+          <p>Ignite &amp; Accelerate went from a blank page to a first edition that worked: business talk in the morning, go-karts in the afternoon.</p>
         </div>
       </div>
     </div>
@@ -543,10 +613,10 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
     <div class="section-inner">
       <p class="kicker">By the numbers</p>
       <div class="stats-grid">
-        <div class="stat reveal"><span class="stat-num"><span data-count="25000">0</span><span class="suffix">+</span></span><span class="stat-label">Summit registrations</span></div>
-        <div class="stat reveal" style="transition-delay:.06s"><span class="stat-num"><span data-count="400">0</span><span class="suffix">+</span></span><span class="stat-label">Ushers led at WUF12</span></div>
-        <div class="stat reveal" style="transition-delay:.12s"><span class="stat-num"><span data-count="25">0</span><span class="suffix">+</span></span><span class="stat-label">Exhibitions</span></div>
-        <div class="stat reveal" style="transition-delay:.18s"><span class="stat-num">2</span><span class="stat-label">Years experience</span></div>
+        <div class="stat reveal"><span class="stat-num odo" data-odo="100" data-suffix="+">100+</span><span class="stat-label">Events delivered, from partner enablements to national summits</span></div>
+        <div class="stat reveal" style="transition-delay:.12s"><span class="stat-num odo" data-odo="25" data-suffix="+">25+</span><span class="stat-label">Exhibitions designed and run</span></div>
+        <div class="stat reveal" style="transition-delay:.18s"><span class="stat-num odo" data-odo="2">2</span><span class="stat-label">Years in events and marketing</span></div>
+      </div>
       </div>
     </div>
   </section>
@@ -555,22 +625,17 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
     <span class="corner-label section-corner">Selected work</span>
     <div class="section-inner">
       <h2 class="section-title">Selected work.</h2>
-      <p class="section-lede">Eight projects, strongest first. Each one opens the full story.</p>
+      <p class="section-lede">Nine events. Open any card for the photos, films and full story.</p>
       <div class="work-cards">
         <article class="reveal from-top">
           <button type="button" class="work-card-btn card-open" data-event="fdc" data-cursor="VIEW">
-            <span class="work-card-media stat-panel">
-              <span class="stat-panel-num">25,000+</span>
-              <span class="stat-panel-label">registrations in 2026, double the year before</span>
-              <span class="stat-panel-row">300+ speakers &middot; 80+ exhibitors &middot; 30+ countries</span>
-              <span class="work-card-view">View</span>
-            </span>
+            <span class="work-card-media"><img src="assets/events/fdc/cover.jpg" alt="" loading="lazy"><span class="work-card-badge"><b>25,000+</b> registrations</span><span class="work-card-view">View</span></span>
             <span class="work-card-text">
               <span class="work-card-title">FDC Summit</span>
               <span class="work-card-meta">
-                <span class="work-card-date">National technology summit &middot; 2025 &ndash; 2026</span>
-                <span class="work-card-tagline">I personally built the registration system, website, mobile app, exhibitor portal, badging, and usher training for Egypt's national technology summit.</span>
-                <span class="work-card-result">25,000+ registrations, 2x the prior edition</span>
+                <span class="work-card-date">National tech summit &middot; 2025 &ndash; 2026 &middot; delivery team</span>
+                <span class="work-card-tagline">Egypt's national tech summit: 300+ speakers, 80+ exhibitors, three days. One of the 10-person team that delivered it end to end, running registration, entry and the usher team.</span>
+                <span class="work-card-result">25,000+ registrations &middot; 2x the last edition</span>
               </span>
             </span>
           </button>
@@ -582,7 +647,7 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
               <span class="work-card-title">Sohour: Echoes of History</span>
               <span class="work-card-meta">
                 <span class="work-card-date">24 February 2026</span>
-                <span class="work-card-tagline">A Ramadan sohour in a centuries-old stone courtyard, built around a live tanoura performance.</span>
+                <span class="work-card-tagline">Ramadan night in a centuries-old stone courtyard. A live tanoura, a full stage program, partner flags lining the way in.</span>
                 <span class="work-card-result">Full house &middot; live performance &middot; event film</span>
               </span>
             </span>
@@ -595,8 +660,8 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
               <span class="work-card-title">Russia Tech Day</span>
               <span class="work-card-meta">
                 <span class="work-card-date">2025</span>
-                <span class="work-card-tagline">My first event: several brands, each with its own identity, sharing one stage, pods, and screens.</span>
-                <span class="work-card-result">Multi-brand stage &middot; full-day program</span>
+                <span class="work-card-tagline">One stage, a lineup of global tech brands, and every one of them still looked like itself, across shared pods, screens and a full-day program.</span>
+                <span class="work-card-result">One stage &middot; many brands &middot; full day</span>
               </span>
             </span>
           </button>
@@ -608,8 +673,8 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
               <span class="work-card-title">Ignite &amp; Accelerate</span>
               <span class="work-card-meta">
                 <span class="work-card-date">6 November 2025</span>
-                <span class="work-card-tagline">The first edition of the partners fun day, piloted by me from a blank page: business talk plus go-karting.</span>
-                <span class="work-card-result">New format, first run, piloted by me</span>
+                <span class="work-card-tagline">A partner day that swapped the conference room for a go-kart track. My pilot, from blank page to first edition.</span>
+                <span class="work-card-result">New format &middot; first edition &middot; my pilot</span>
               </span>
             </span>
           </button>
@@ -621,7 +686,7 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
               <span class="work-card-title">Padel Tournament</span>
               <span class="work-card-meta">
                 <span class="work-card-date">2026</span>
-                <span class="work-card-tagline">A night tournament on lit blue courts, from the entrance arch to the trophies.</span>
+                <span class="work-card-tagline">Partners on lit blue courts after dark, from the entrance arch to the trophy lift.</span>
                 <span class="work-card-result">Recap film &middot; 3 reels</span>
               </span>
             </span>
@@ -634,7 +699,7 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
               <span class="work-card-title">Football Night: Live Screening</span>
               <span class="work-card-meta">
                 <span class="work-card-date">15 June 2026</span>
-                <span class="work-card-tagline">An open-air screening: one giant screen, beanbags, a trophy photo wall, everyone in Egypt red.</span>
+                <span class="work-card-tagline">Egypt played, partners watched: one giant screen on an open lawn, beanbags, a trophy wall, everyone in red.</span>
                 <span class="work-card-result">Open-air screening &middot; recap film</span>
               </span>
             </span>
@@ -647,8 +712,8 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
               <span class="work-card-title">North Coast Tech Retreat</span>
               <span class="work-card-meta">
                 <span class="work-card-date">27&ndash;29 August 2026</span>
-                <span class="work-card-tagline">Three days at a beachfront resort: talks, a rooftop dinner, and a beach afternoon.</span>
-                <span class="work-card-result">3 days &middot; talks, dinner, beach day</span>
+                <span class="work-card-tagline">Three days of talks by the sea, a rooftop dinner, and a beach afternoon nobody wanted to end.</span>
+                <span class="work-card-result">3 days &middot; beachfront &middot; talks to beach</span>
               </span>
             </span>
           </button>
@@ -660,8 +725,21 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
               <span class="work-card-title">Partner Bowling Day</span>
               <span class="work-card-meta">
                 <span class="work-card-date">2026</span>
-                <span class="work-card-tagline">A bowling and arcade day for a technology partner, from the first roll to the trophies.</span>
+                <span class="work-card-tagline">Strikes, arcade rounds and a trophy for a technology partner's team.</span>
                 <span class="work-card-result">Recap film &middot; vertical reel</span>
+              </span>
+            </span>
+          </button>
+        </article>
+        <article class="reveal from-top">
+          <button type="button" class="work-card-btn card-open" data-event="wuf" data-cursor="VIEW">
+            <span class="work-card-media"><img src="assets/events/wuf/cover.jpg" alt="" loading="lazy"><span class="work-card-badge"><b>37,000+</b> participants</span><span class="work-card-view">View</span></span>
+            <span class="work-card-text">
+              <span class="work-card-title">World Urban Forum (WUF12)</span>
+              <span class="work-card-meta">
+                <span class="work-card-date">November 2024 &middot; where it started</span>
+                <span class="work-card-tagline">The biggest World Urban Forum on record. I ran the press conference hall and a team of 400+ ushers, on time, under UN protocol.</span>
+                <span class="work-card-result">400+ ushers &middot; 37,000+ participants &middot; 182 countries</span>
               </span>
             </span>
           </button>
@@ -673,9 +751,11 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
   <section class="section" id="partners">
     <span class="corner-label section-corner">Who I've worked with</span>
     <div class="section-inner">
-      <p class="kicker">Partner ecosystem</p>
-      <h2 class="section-title">Brands on-site.</h2>
-      <div class="brand-row reveal">
+      <p class="kicker">Clients</p>
+      <h2 class="section-title">Brands I run marketing for.</h2>
+      <p class="section-lede">Events and marketing activity in Egypt for the global tech vendors below.</p>
+      <div class="brand-row reveal" id="brandMarquee">
+        <span><img class="brand-mark" src="assets/logos/googlecloud.png" alt="Google Cloud" loading="lazy"></span>
         <span><img class="brand-mark" src="assets/logos/paloalto.svg" alt="Palo Alto Networks" loading="lazy"></span>
         <span><img class="brand-mark tall" src="assets/logos/f5.svg" alt="F5" loading="lazy"></span>
         <span><img class="brand-mark tall" src="assets/logos/aws.svg" alt="AWS" loading="lazy"></span>
@@ -699,7 +779,6 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
         <span><img class="brand-mark wide" src="assets/logos/extrahop.svg" alt="ExtraHop" loading="lazy"></span>
         <span><img class="brand-mark" src="assets/logos/ciena.svg" alt="Ciena" loading="lazy"></span>
         <span><img class="brand-mark" src="assets/logos/proofpoint.png" alt="Proofpoint" loading="lazy"></span>
-        <span><img class="brand-mark" src="assets/logos/googlecloud.png" alt="Google Cloud" loading="lazy"></span>
         <span><img class="brand-mark" src="assets/logos/gigamon.png" alt="Gigamon" loading="lazy"></span>
         <span><span class="brand-text">Exabeam</span></span>
         <span><span class="brand-text">Nozomi Networks</span></span>
@@ -722,17 +801,17 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
       </figure>
       <div class="about-body reveal" style="transition-delay:.1s">
         <p class="kicker">About</p>
-        <h2 class="section-title">Ideas, brought to life.</h2>
+        <h2 class="section-title">From brief to doors open.</h2>
         <div class="about-copy">
-          <p>I'm Abdelrahman Gawish, a Marketing Coordinator working across events and digital marketing. I plan, organize, and orchestrate the whole event, from the first idea to the last detail on the night.</p>
-          <p>I turn a brief into a working plan: the timeline, the suppliers, and the run-of-show. When something changes live, I stay calm and keep the room moving.</p>
-          <p>Nothing beats watching an idea come to life in a full room. Making that happen for you is my job.</p>
+          <p>I'm a Marketing Coordinator in Cairo, working agency-side for global tech brands. I take an event from the first idea to the last guest out, and run the marketing around it.</p>
+          <p>Brief in, plan out: timeline, suppliers, run-of-show. When something changes live, I stay calm and keep the room moving.</p>
+          <p>The best part is the full room. Getting it there is the job.</p>
         </div>
         <div class="about-facts">
           <div class="fact"><span>Role</span><strong>Marketing Coordinator</strong></div>
           <div class="fact"><span>Focus</span><strong>Events and Digital Marketing</strong></div>
           <div class="fact"><span>Experience</span><strong>2 years</strong></div>
-          <div class="fact"><span>Events featured</span><strong>7, from 2025 to 2026</strong></div>
+          <div class="fact"><span>Events delivered</span><strong>100+</strong></div>
         </div>
       </div>
     </div>
@@ -743,7 +822,7 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
     <div class="living-glow" style="width:300px;height:300px;top:8%;left:4%"></div>
     <div class="section-inner">
       <p class="kicker">Skills</p>
-      <h2 class="section-title">The craft behind the events.</h2>
+      <h2 class="section-title">What I actually do.</h2>
       <div class="skills-grid">
         <article class="skill-card reveal">
           <span class="skill-num">01</span>
@@ -751,10 +830,9 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
           <ul class="chips">
             <li>Event planning and run-of-show</li>
             <li>On-site production management</li>
-            <li>Presentation skills</li>
-            <li>Event hosting / MC</li>
+            <li>Hosting, MC and presenting</li>
           </ul>
-          <p class="skill-seeit">See it <button type="button" class="card-open skill-seeit-link" data-event="russia" data-cursor="VIEW">Russia Tech Day, multi-brand stage &rarr;</button></p>
+          <p class="skill-seeit">See it <button type="button" class="card-open skill-seeit-link" data-event="russia" data-cursor="VIEW">Russia Tech Day, one stage, many brands &rarr;</button></p>
         </article>
         <article class="skill-card reveal" style="transition-delay:.08s">
           <span class="skill-num">02</span>
@@ -798,6 +876,29 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
     </div>
   </section>
 
+  <section class="section focus-section" id="focus" aria-label="An interactive moment">
+    <div class="living-glow" style="width:320px;height:320px;top:0;left:calc(50% - 160px)"></div>
+    <p class="kicker">Try it</p>
+    <h2 class="section-title" style="max-width:22ch">This is the job, in one press.</h2>
+    <div class="focus-rig">
+      <svg viewBox="0 0 220 220" aria-hidden="true">
+        <circle class="focus-dot" cx="30" cy="40" r="4" fill="var(--text-secondary)"/>
+        <circle class="focus-dot" cx="190" cy="35" r="4" fill="var(--text-secondary)"/>
+        <circle class="focus-dot" cx="25" cy="180" r="4" fill="var(--text-secondary)"/>
+        <circle class="focus-dot" cx="195" cy="185" r="4" fill="var(--text-secondary)"/>
+        <circle class="focus-dot" cx="110" cy="15" r="4" fill="var(--text-secondary)"/>
+        <circle class="focus-dot" cx="15" cy="110" r="4" fill="var(--text-secondary)"/>
+      </svg>
+    <button class="focus-hold" id="focusHold" type="button" aria-describedby="focusResult" data-cursor="HOLD">
+      <svg class="ring-progress" viewBox="0 0 120 120" aria-hidden="true">
+        <circle cx="60" cy="60" r="54" fill="none" stroke="var(--accent-muted)" stroke-width="2"/>
+        <circle id="focusRingFg" cx="60" cy="60" r="54" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="339" stroke-dashoffset="339"/>
+      </svg>
+      <span id="focusLabel">Hold to focus</span>
+    </button>
+    </div>
+    <p class="focus-result" id="focusResult">Coordinated.</p>
+  </section>
   <section class="section contact-section" id="contact">
     <p class="kicker">Get in touch</p>
     <h2 class="section-title">Next event, or just a conversation.</h2>
@@ -808,6 +909,11 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
       <a class="btn ghost" href="https://www.linkedin.com/in/abdelrahman-gawish01" target="_blank" rel="noopener noreferrer" data-cursor="OPEN">LinkedIn</a>
     </div>
     <p class="contact-phone">Or call <a href="tel:+201123263925">+20 112 326 3925</a></p>
+  </section>
+
+  <section class="strip" aria-label="Moments from the events">
+    <div class="strip-track"><img src="assets/events/wuf/02.jpg" alt="" loading="lazy" style="--w:200;--h:290"><img src="assets/events/fdc/03.jpg" alt="" loading="lazy" style="--w:285;--h:205"><img src="assets/events/sohour/04.jpg" alt="" loading="lazy" style="--w:285;--h:290"><img src="assets/events/ignite/05.jpg" alt="" loading="lazy" style="--w:200;--h:290"><img src="assets/events/padel/06.jpg" alt="" loading="lazy" style="--w:230;--h:165"><img src="assets/events/worldcup/03.jpg" alt="" loading="lazy" style="--w:225;--h:290"><img src="assets/events/northcoast/04.jpg" alt="" loading="lazy" style="--w:250;--h:370"><img src="assets/events/russia/03.jpg" alt="" loading="lazy" style="--w:200;--h:165"><img src="assets/events/bowling/02.jpg" alt="" loading="lazy" style="--w:200;--h:290"><img src="assets/events/fdc/07.jpg" alt="" loading="lazy" style="--w:285;--h:205"><img src="assets/events/wuf/05.jpg" alt="" loading="lazy" style="--w:285;--h:290"><img src="assets/events/sohour/07.jpg" alt="" loading="lazy" style="--w:200;--h:290"><img src="assets/events/ignite/09.jpg" alt="" loading="lazy" style="--w:230;--h:165"><img src="assets/events/northcoast/08.jpg" alt="" loading="lazy" style="--w:225;--h:290"><img src="assets/events/wuf/02.jpg" alt="" loading="lazy" style="--w:200;--h:290" aria-hidden="true"><img src="assets/events/fdc/03.jpg" alt="" loading="lazy" style="--w:285;--h:205" aria-hidden="true"><img src="assets/events/sohour/04.jpg" alt="" loading="lazy" style="--w:285;--h:290" aria-hidden="true"><img src="assets/events/ignite/05.jpg" alt="" loading="lazy" style="--w:200;--h:290" aria-hidden="true"><img src="assets/events/padel/06.jpg" alt="" loading="lazy" style="--w:230;--h:165" aria-hidden="true"><img src="assets/events/worldcup/03.jpg" alt="" loading="lazy" style="--w:225;--h:290" aria-hidden="true"><img src="assets/events/northcoast/04.jpg" alt="" loading="lazy" style="--w:250;--h:370" aria-hidden="true"><img src="assets/events/russia/03.jpg" alt="" loading="lazy" style="--w:200;--h:165" aria-hidden="true"><img src="assets/events/bowling/02.jpg" alt="" loading="lazy" style="--w:200;--h:290" aria-hidden="true"><img src="assets/events/fdc/07.jpg" alt="" loading="lazy" style="--w:285;--h:205" aria-hidden="true"><img src="assets/events/wuf/05.jpg" alt="" loading="lazy" style="--w:285;--h:290" aria-hidden="true"><img src="assets/events/sohour/07.jpg" alt="" loading="lazy" style="--w:200;--h:290" aria-hidden="true"><img src="assets/events/ignite/09.jpg" alt="" loading="lazy" style="--w:230;--h:165" aria-hidden="true"><img src="assets/events/northcoast/08.jpg" alt="" loading="lazy" style="--w:225;--h:290" aria-hidden="true"></div>
+    <p class="strip-text">Abdelrahman Gawish is an event and marketing coordinator in Cairo, running events and campaigns in Egypt for global tech brands. From a 37,000-person UN forum to a national summit and 100+ partner events, the job stays the same: get the right people in the room, then make the room worth it.</p>
   </section>
 
 </main>
@@ -838,6 +944,8 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
   </div>
 </dialog>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script>
 (function(){
   document.getElementById('year').textContent = new Date().getFullYear();
@@ -868,23 +976,657 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
   const heroEl = document.getElementById('hero');
   requestAnimationFrame(()=>requestAnimationFrame(()=>heroEl.classList.add('loaded')));
 
-  /* ---------- hero background crossfade ---------- */
+  /* ---------- hero: silver ouroboros (scaled snake on a knot loop) with a reactive particle halo ---------- */
   (function(){
-    const slides = document.querySelectorAll('#heroBg .hero-bg-slide');
-    if(!slides.length) return;
-    const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-    if(reduced.matches) return;
-    let i = 0, timer = null;
-    function next(){
-      slides[i].classList.remove('is-active');
-      i = (i+1) % slides.length;
-      slides[i].classList.add('is-active');
+    const stage = document.getElementById('heroStage');
+    const canvas = document.getElementById('heroCanvas');
+    const hero = document.getElementById('hero');
+    if(!stage || !canvas || !window.THREE){ if(stage) stage.classList.add('no-3d'); return; }
+    const T = window.THREE;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const skipIntro = reduced || location.hash === '#nointro';
+
+    const renderer = new T.WebGLRenderer({canvas, antialias:true, alpha:true});
+    /* start at a modest pixel density; the frame loop lowers it further if frames run slow */
+    let curPR = Math.min(devicePixelRatio || 1, 1.5), slowF = 0, perfF = 0;
+    renderer.setPixelRatio(curPR);
+    renderer.outputEncoding = T.sRGBEncoding;
+    renderer.toneMapping = T.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
+    const scene = new T.Scene();
+    const camera = new T.PerspectiveCamera(30, 1, 0.1, 100);
+    camera.position.set(0, 0, 10);
+
+    (function(){
+      const c = document.createElement('canvas'); c.width = 1024; c.height = 512;
+      const g = c.getContext('2d');
+      g.fillStyle = '#060607'; g.fillRect(0,0,1024,512);
+      const strip = (x,y,w,h,col,blur)=>{ g.filter = 'blur('+blur+'px)'; g.fillStyle = col; g.fillRect(x,y,w,h); };
+      strip(100, 60, 90, 340, 'rgba(255,255,255,1)', 16);
+      strip(540, 40, 340, 56, 'rgba(255,255,255,.9)', 20);
+      strip(860, 140, 70, 290, 'rgba(255,255,255,.65)', 14);
+      strip(320, 290, 140, 50, 'rgba(255,255,255,.4)', 22);
+      strip(420, 380, 480, 70, 'rgba(230,52,34,1)', 28);
+      strip(0, 240, 1024, 24, 'rgba(230,52,34,.3)', 36);
+      g.filter = 'none';
+      const tex = new T.CanvasTexture(c);
+      tex.mapping = T.EquirectangularReflectionMapping; tex.encoding = T.sRGBEncoding;
+      const pm = new T.PMREMGenerator(renderer);
+      scene.environment = pm.fromEquirectangular(tex).texture;
+      tex.dispose(); pm.dispose();
+    })();
+
+    scene.add(new T.AmbientLight(0xffffff, 0.06));
+    const redLight = new T.PointLight(0xff2b18, 7, 20); redLight.position.set(3.2, -1.6, 2.8); scene.add(redLight);
+    const keyLight = new T.DirectionalLight(0xffffff, 0.9); keyLight.position.set(-3, 4, 6); scene.add(keyLight);
+
+    /* one skin for head and body: the head model's own scales (body tile cut from its neck), shaded silver */
+    const HEAD_LOOK = [
+      '  float lum = dot(tx.rgb, vec3(0.299,0.587,0.114));',
+      '  float red = tx.r - max(tx.g, tx.b);',
+      '  vec3 silver = vec3(0.80,0.81,0.85)*(0.35 + 0.9*lum);',
+      '  diffuseColor.rgb = mix(silver, vec3(0.22,0.012,0.008), smoothstep(0.05,0.18,red));',
+      '  diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.015), 1.0 - smoothstep(0.04,0.11,lum));'].join('\n');
+    const lookChunk = '#ifdef USE_MAP\n  vec4 tx = texture2D( map, vUv );\n' + HEAD_LOOK + '\n#endif';
+    /* the neck tile is ~3x darker on average than the skull panels: lift it so both read as the same metal */
+    const bodyLookChunk = '#ifdef USE_MAP\n  vec4 tx = texture2D( map, vUv );\n  tx.rgb = min(tx.rgb*2.9, vec3(1.0));\n' + HEAD_LOOK + '\n#endif';
+    const texL = new T.TextureLoader();
+    const bodyMap = texL.load('assets/models/body-color.png'), bodyNrm = texL.load('assets/models/body-normal.png');
+    [bodyMap, bodyNrm].forEach(tx=>{ tx.flipY = false; tx.wrapS = tx.wrapT = T.RepeatWrapping; tx.anisotropy = 8; });
+    bodyMap.encoding = T.sRGBEncoding;
+    const TILE_LEN = 0.72, SNAKE = { uCut: 0.97, len: 12 };
+    const skin = new T.MeshPhysicalMaterial({map:bodyMap, normalMap:bodyNrm, normalScale:new T.Vector2(1.3,-1.3), clearcoatNormalMap:bodyNrm, clearcoatNormalScale:new T.Vector2(1.3,-1.3), metalness:1, roughness:0.24, clearcoat:0.9, clearcoatRoughness:0.1, envMapIntensity:1.9});
+    /* hypnotic flow: red glow bands travel from the mouth down to the tail, forever */
+    const flowU = { value: 0 };
+    /* swallowing: bulges ride down the body from the neck to the tail, each one carrying the red pulse */
+    const SWALLOW_N = 4.0, SWALLOW_V = 0.157, SWALLOW_AMP = 0.0;
+    skin.onBeforeCompile = (sh)=>{
+      sh.uniforms.uFlow = flowU;
+      sh.vertexShader = sh.vertexShader
+        .replace('#include <common>', '#include <common>\nvarying float vBodyU;\nvarying float vInner;\nvarying float vBulge;\nattribute float aInner;\nattribute vec3 aTan;\nuniform float uFlow;')
+        .replace('#include <beginnormal_vertex>', [
+          '#include <beginnormal_vertex>',
+          'float bph = fract(uv.x*' + SWALLOW_N.toFixed(1) + ' + uFlow*' + SWALLOW_V.toFixed(4) + ');',
+          'float bz = (bph - 0.5)/0.06;',
+          'float bump = exp(-bz*bz);',
+          'float bfade = smoothstep(0.03, 0.12, uv.x) * (1.0 - smoothstep(U_CUT - 0.05, U_CUT - 0.01, uv.x)) * (1.0 - aInner);',
+          'float slope = ' + SWALLOW_AMP.toFixed(4) + ' * bump * (-2.0*bz/0.06) * ' + SWALLOW_N.toFixed(1) + ' / BODY_LEN * bfade;',
+          'objectNormal = normalize(objectNormal - aTan*slope);',
+          'vBulge = bump*bfade;'].join('\n'))
+        .replace('#include <begin_vertex>', '#include <begin_vertex>\ntransformed += normal * ' + SWALLOW_AMP.toFixed(4) + ' * vBulge;')
+        .replace('#include <uv_vertex>', '#include <uv_vertex>\nvBodyU = uv.x;\nvInner = aInner;');
+      sh.vertexShader = sh.vertexShader.replace(/U_CUT/g, SNAKE.uCut.toFixed(5)).replace(/BODY_LEN/g, SNAKE.len.toFixed(4));
+      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying float vBodyU;\nvarying float vInner;\nvarying float vBulge;\nuniform float uFlow;')
+        .replace('#include <map_fragment>', bodyLookChunk + '\ndiffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.16,0.01,0.006), vInner);')
+        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\nfloat ph = fract(vBodyU*14.0 + uFlow*0.55);\nfloat band = smoothstep(0.0,0.03,ph)*(1.0-smoothstep(0.03,0.12,ph));\nfloat edge = smoothstep(0.02, 0.2, vBodyU);\ntotalEmissiveRadiance += vec3(0.0);');
+    };
+
+    /* path: a trefoil loop, like the knot, closed so the head meets the tail */
+    const P = 2, Q = 3, SIZE = 1.05;
+    function knotPoint(t, out){
+      const u = t*P*Math.PI*2, cu = Math.cos(u), su = Math.sin(u), qu = Q/P*u, cs = Math.cos(qu);
+      return out.set(SIZE*(2+cs)*0.5*cu, SIZE*(2+cs)*su*0.5, SIZE*Math.sin(qu)*0.5);
     }
-    function start(){ if(!timer) timer = setInterval(next, 4600); }
-    function stop(){ if(timer){ clearInterval(timer); timer = null; } }
-    start();
-    document.addEventListener('visibilitychange', ()=>{ document.hidden ? stop() : start(); });
-    reduced.addEventListener('change', (e)=>{ if(e.matches) stop(); else start(); });
+    const SEG = 640, RAD = 28, MAXR = 0.165;
+    /* head model landmarks (model units): neck axis sits below the head axis; mouth gape centre */
+    const NECK_Y = -0.17, NECK_Z = -1.15, NECK_R = 0.245;
+    /* jaw rig (model sculpt is gaping ~80deg, skull tilted up): pitch the skull down about the neck joint,
+       then lift the lower jaw about its hinge. Same maths runs in the head's vertex shader. */
+    const D2R = Math.PI/180, JAW = { nz:-0.45, ny:0.0, hz:-0.08, hy:0.02, A:34*D2R, B:37*D2R };
+    const rotZY = (z,y,cz,cy,th)=>{ const dz = z-cz, dy = y-cy, c = Math.cos(th), s = Math.sin(th); return [cz + dz*c - dy*s, cy + dz*s + dy*c]; };
+    const [HZ1, HY1] = rotZY(JAW.hz, JAW.hy, JAW.nz, JAW.ny, -JAW.A);
+    const BIS = (21*D2R - JAW.A + JAW.B)/2;
+    const MOUTH_Z = HZ1 + Math.cos(BIS)*0.6, MOUTH_Y = HY1 + Math.sin(BIS)*0.6;
+    const GUL_Z = MOUTH_Z - Math.cos(BIS)*0.7, GUL_Y = MOUTH_Y - Math.sin(BIS)*0.7;
+    const MOUTH_ANG = Math.atan2(MOUTH_Y-NECK_Y, MOUTH_Z-NECK_Z), MOUTH_LEN = Math.hypot(MOUTH_Y-NECK_Y, MOUTH_Z-NECK_Z);
+    const tailP = knotPoint(0, new T.Vector3());
+    /* head sized so its neck matches the body; the body end is then bent to run straight into the neck */
+    const MOUTH_REACH = 0.92;
+    const BODY_END = (function(){ const q = new T.Vector3(); for(let t=0.998;t>0.8;t-=0.0004){ if(knotPoint(t,q).distanceTo(tailP) >= MOUTH_REACH) return t; } return 0.95; })();
+    const hs = 0.45, END_R = NECK_R*hs;   /* head scale: about as wide as the body, short enough to ride the pretzel's curves */
+    function radiusAt(t){
+      if(t < 0.2){ const k = t/0.2; return 0.05 + (MAXR-0.05)*(k*k*(3-2*k)); }
+      if(t > 0.86){ const k = Math.min(1,(t-0.86)/(BODY_END-0.86)); return MAXR + (END_R-MAXR)*(k*k*(3-2*k)); }
+      return MAXR;
+    }
+    const pts = [], tans = [];
+    const a = new T.Vector3(), b = new T.Vector3();
+    for(let i=0;i<=SEG;i++){
+      const t = i/SEG*BODY_END;
+      pts.push(knotPoint(t, new T.Vector3()));
+      knotPoint(t+0.0005, a); knotPoint(t-0.0005, b); tans.push(a.clone().sub(b).normalize());
+    }
+    /* neck direction: tilted from the chord to the tail by the head's own mouth angle */
+    const neckP = pts[SEG].clone(), chord = tailP.clone().sub(neckP).normalize();
+    /* roll the head so the tail, once out of the mouth, peels away sideways through the open gape, never through the skull */
+    const devT = tans[0].clone().sub(chord.clone().multiplyScalar(tans[0].dot(chord)));
+    const kv = new T.Vector3().crossVectors(chord, devT).normalize(); if(kv.z < 0) kv.negate();
+    const fwd = chord.clone().multiplyScalar(Math.cos(MOUTH_ANG)).addScaledVector(kv, -Math.sin(MOUTH_ANG)).normalize();
+    const upV = chord.clone().multiplyScalar(Math.sin(MOUTH_ANG)).addScaledVector(kv, Math.cos(MOUTH_ANG)).normalize();
+    (function(){
+      const dT = fwd.clone().sub(tans[SEG]), BEND = 0.6; let s = 0;
+      for(let i=SEG-1;i>=0;i--){
+        s += pts[i].distanceTo(pts[i+1]); if(s > BEND) break;
+        const x = -s, f = x*(1+x/BEND)*(1+x/BEND);
+        pts[i].addScaledVector(dT, f);
+      }
+      for(let i=1;i<SEG;i++) tans[i] = pts[i+1].clone().sub(pts[i-1]).normalize();
+      tans[SEG] = fwd.clone();
+    })();
+    /* head frame: neck runs along fwd, rolled so the open jaw sits on the tail */
+    const up = upV.clone();
+    const sideV = new T.Vector3().crossVectors(up, fwd);
+    const headPos = neckP.clone().addScaledVector(up, -NECK_Y*hs).addScaledVector(fwd, -NECK_Z*hs);
+    const headPt = (x,y,z)=>headPos.clone().addScaledVector(sideV, x*hs).addScaledVector(up, y*hs).addScaledVector(fwd, z*hs);
+
+    /* one continuous tube: tail tip down the throat, out of the mouth, round the knot, and on through the neck
+       right up to the skull, so the moving scales never stop and the model's static neck is cut away */
+    const HEAD_CUT = -0.85, HEAD_FADE = 0.14;
+    /* the tail leaves straight out between the jaws, then eases into the knot */
+    const dOut = up.clone().multiplyScalar(Math.sin(BIS)).addScaledVector(fwd, Math.cos(BIS)).normalize();
+    (function(){
+      const dT = dOut.clone().sub(tans[0]), L = 0.6, arc = [0];
+      for(let i=1;i<=SEG;i++) arc.push(arc[i-1] + pts[i].distanceTo(pts[i-1]));
+      for(let i=1;i<=SEG && arc[i] < L;i++){ const s = arc[i], f = s*(1-s/L)*(1-s/L); pts[i].addScaledVector(dT, f); }
+    })();
+    const rings = []; let cutRing = 0, cutZ = HEAD_CUT;
+    (function(){
+      for(let i=0;i<14;i++){
+        const s = i/14;
+        rings.push({p:tailP.clone().addScaledVector(dOut, -(1-s)*0.62*hs), r:0.03 + 0.02*s, k:0});
+      }
+      for(let i=0;i<=SEG;i++) rings.push({p:pts[i], r:radiusAt(i/SEG*BODY_END), k:0});
+      const NECK = [[-1.15,-0.17,0.245,0.245],[-1.0,-0.165,0.28,0.295],[-0.9,-0.125,0.28,0.305],[-0.8,-0.075,0.28,0.305],[-0.7,-0.03,0.26,0.32],[-0.6,0.04,0.25,0.35]];
+      const lerpNeck = (z)=>{ for(let n=1;n<NECK.length;n++){ if(z <= NECK[n][0]){ const A = NECK[n-1], B = NECK[n], f = (z-A[0])/(B[0]-A[0]); return A.map((v,m)=>v + (B[m]-v)*f); } } return NECK[NECK.length-1]; };
+      for(let z=-1.125; z<=HEAD_CUT+HEAD_FADE+0.01; z+=0.025){
+        const [ , yc, hx, hy] = lerpNeck(z), g = 1.03 - 0.04*Math.min(1, Math.max(0, (z-HEAD_CUT)/HEAD_FADE));
+        rings.push({p:headPt(0, yc, z), rx:hx*g*hs, ry:hy*g*hs, k:1, inner:0});
+        cutRing = rings.length-1; cutZ = z;
+      }
+      /* past the cut the tube becomes the gullet: narrows toward the throat behind the jaw hinge, turns to dark flesh */
+      const z0 = cutZ, [ , yc0, hx0, hy0] = lerpNeck(z0);
+      for(let n=1;n<=14;n++){
+        const f = n/14, e = f*f*(3-2*f), sc = 1 - 0.5*e, z = z0 + (GUL_Z-z0)*f;
+        rings.push({p:headPt(0, yc0 + (GUL_Y-yc0)*e, z), rx:hx0*0.99*hs*sc, ry:hy0*0.99*hs*sc, k:1, inner:Math.min(1, f*3)});
+      }
+      [0.75, 0.4, 0.001].forEach((c,n)=>{ rings.push({p:headPt(0, GUL_Y, GUL_Z + 0.012*(n+1)), rx:hx0*0.99*hs*0.5*c, ry:hy0*0.99*hs*0.5*c, k:1, inner:1}); });
+    })();
+    const NR = rings.length;
+    const tns = rings.map((rg,i)=> rings[Math.min(NR-1,i+1)].p.clone().sub(rings[Math.max(0,i-1)].p).normalize());
+    const nrms = [], bins = [];
+    let n0 = new T.Vector3(0,0,1); n0.sub(tns[0].clone().multiplyScalar(n0.dot(tns[0]))).normalize();
+    nrms.push(n0); bins.push(new T.Vector3().crossVectors(tns[0], n0));
+    for(let i=1;i<NR;i++){
+      const prev = nrms[i-1].clone();
+      const n = prev.sub(tns[i].clone().multiplyScalar(prev.dot(tns[i]))).normalize();
+      nrms.push(n); bins.push(new T.Vector3().crossVectors(tns[i], n));
+    }
+    const verts = [], norms = [], uvs = [], inner = [], tanA = [], idx = [];
+    let len = 0; const lens = [0];
+    for(let i=1;i<NR;i++){ len += rings[i].p.distanceTo(rings[i-1].p); lens.push(len); }
+    const dir = new T.Vector3(), off = new T.Vector3(), nor = new T.Vector3();
+    for(let i=0;i<NR;i++){
+      const rg = rings[i];
+      for(let j=0;j<=RAD;j++){
+        const th = j/RAD*Math.PI*2;
+        dir.copy(nrms[i]).multiplyScalar(Math.cos(th)).addScaledVector(bins[i], Math.sin(th));
+        if(rg.k){
+          const ds = dir.dot(sideV), du = dir.dot(up);
+          off.copy(sideV).multiplyScalar(ds*rg.rx).addScaledVector(up, du*rg.ry);
+          nor.copy(sideV).multiplyScalar(ds/rg.rx).addScaledVector(up, du/rg.ry).normalize();
+        } else { off.copy(dir).multiplyScalar(rg.r); nor.copy(dir); }
+        verts.push(rg.p.x + off.x, rg.p.y + off.y, rg.p.z + off.z);
+        norms.push(nor.x, nor.y, nor.z);
+        uvs.push(lens[i]/len, j/RAD); inner.push(rg.inner || 0); tanA.push(tns[i].x, tns[i].y, tns[i].z);
+      }
+    }
+    for(let i=0;i<NR-1;i++) for(let j=0;j<RAD;j++){
+      const p0 = i*(RAD+1)+j, p1 = p0+RAD+1;
+      idx.push(p0, p1, p0+1, p1, p1+1, p0+1);
+    }
+    bodyMap.repeat.set(Math.round(len/TILE_LEN), 1); bodyNrm.repeat.copy(bodyMap.repeat);
+    const bodyGeo = new T.BufferGeometry();
+    bodyGeo.setAttribute('position', new T.Float32BufferAttribute(verts, 3));
+    bodyGeo.setAttribute('normal', new T.Float32BufferAttribute(norms, 3));
+    bodyGeo.setAttribute('uv', new T.Float32BufferAttribute(uvs, 2));
+    bodyGeo.setAttribute('aInner', new T.Float32BufferAttribute(inner, 1));
+    bodyGeo.setAttribute('aTan', new T.Float32BufferAttribute(tanA, 3));
+    const U_CUT = lens[cutRing]/len;
+    bodyGeo.setIndex(idx);
+
+    const holder = new T.Group(); scene.add(holder);
+    const spin = new T.Group(); holder.add(spin);
+    const bodyMesh = new T.Mesh(bodyGeo, skin); bodyMesh.frustumCulled = false; spin.add(bodyMesh);
+
+    /* head: real sculpted snake head (glTF), same skin, its own neck cut away behind the jaw */
+    const headInv = { value: new T.Matrix4() };
+    let headReady = false;
+    const headSkin = new T.MeshPhysicalMaterial({color:0xffffff, metalness:1, roughness:0.24, clearcoat:0.9, clearcoatRoughness:0.1, envMapIntensity:1.9});
+    const jawB = { value: JAW.B }, blinkU = { value: 0 };
+    /* head skin: the body's own scale tile wrapped round the head and scrolled with the body, so scales slide nose to neck;
+       the model's texture is kept only as a mask for the mouth lining */
+    const scrollU = { value: 0 };
+    const headSkinChunk = [
+      'vec4 txA = texture2D(map, vUv);',
+      'float redA = txA.r - max(txA.g, txA.b);',
+      'float hcy = mix(-0.17, 0.0, smoothstep(-0.8, 0.0, vDP.z));',
+      'float radH = length(vec2(vDP.x, vDP.y - hcy)), angH = atan(vDP.x, vDP.y - hcy), angB = atan(-vDP.x, hcy - vDP.y);',
+      /* true arc length round the head, in body-circumference units, so scales match the body in size */
+      'float arcK = radH/' + (MAXR/hs).toFixed(5) + '/6.2831853;',
+      'uvS = vec2(vDP.z*HEAD_TPM + uScroll, angH*arcK + 0.5);',
+      'vec2 uvSB = vec2(uvS.x, angB*arcK);',
+      'vec4 tx = texture2D(uBodyMap, uvS); tx.rgb = pow(tx.rgb, vec3(2.2));',
+      'tx.rgb = min(tx.rgb*2.9, vec3(1.0));',
+      HEAD_LOOK,
+      'diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.22,0.012,0.008), smoothstep(0.05,0.18,redA));'].join('\n');
+    const headNormalChunk = [
+      'vec3 mapN = texture2D(uBodyNrm, uvS).xyz*2.0 - 1.0;',
+      'mapN.xy *= normalScale * (1.0 - isEye);',
+      'float tA = uvS.y, tB = uvSB.y;',
+      'vec2 st0 = vec2(dFdx(uvS.x), abs(dFdx(tA)) < abs(dFdx(tB)) ? dFdx(tA) : dFdx(tB));',
+      'vec2 st1 = vec2(dFdy(uvS.x), abs(dFdy(tA)) < abs(dFdy(tB)) ? dFdy(tA) : dFdy(tB));',
+      'vec3 q0 = dFdx(-vViewPosition), q1 = dFdy(-vViewPosition);',
+      'float sgnS = sign(st1.t*st0.s - st0.t*st1.s);',
+      'vec3 Sv = normalize((q0*st1.t - q1*st0.t)*sgnS), Tv = normalize((-q0*st1.s + q1*st0.s)*sgnS);',
+      'mapN.xy *= (float(gl_FrontFacing)*2.0 - 1.0);',
+      'normal = normalize(mat3(Sv, Tv, normal)*mapN);'].join('\n');
+    const f3 = (n)=>n.toFixed(5);
+    /* eyes: glossy black globe, red-gold iris, sharp vertical slit; lids close on uBlink */
+    const EYE_C = [0.235, 0.74, 0.11];
+    const eyeChunk = [
+      'float isEye = 0.0; vec3 eyeEmit = vec3(0.0);',
+      '#ifdef USE_MAP',
+      'if(vUv.x > 0.78 && vUv.y < 0.45){',
+      '  vec3 p = normalize(vec3(abs(vMP.x), vMP.y, vMP.z) - vec3(' + EYE_C.map(f3).join(',') + '));',
+      '  vec3 o = normalize(vec3(1.0, 0.12, 0.3));',
+      '  vec3 upS = vec3(0.0, ' + f3(Math.cos(JAW.A)) + ', ' + f3(-Math.sin(JAW.A)) + '); upS = normalize(upS - o*dot(upS, o));',
+      '  vec3 sd = cross(o, upS);',
+      '  float fa = dot(p, sd), fb = dot(p, upS), fr = dot(p, o), rr = length(vec2(fa, fb));',
+      '  vec3 col = vec3(0.01); isEye = 1.0;',
+      '  if(fr > 0.0 && rr < 0.64){',
+      '    float ang = atan(fb, fa);',
+      '    vec3 iris = mix(vec3(0.5,0.025,0.012), vec3(0.98,0.36,0.08), smoothstep(0.62, 0.1, rr)) * (0.78 + 0.22*sin(ang*46.0));',
+      '    float slitW = 0.07*sqrt(max(0.0, 1.0 - pow(fb/0.6, 2.0)));',
+      '    float slit = 1.0 - smoothstep(slitW*0.75, slitW*1.05, abs(fa));',
+      '    float rim = smoothstep(0.56, 0.63, rr);',
+      '    col = mix(mix(iris, vec3(0.0), slit), vec3(0.015), rim);',
+      '    eyeEmit = iris*0.45*(1.0 - slit)*(1.0 - rim);',
+      '  }',
+      '  float lid = (1.0 - uBlink)*0.98;',
+      '  float covered = smoothstep(lid - 0.04, lid + 0.02, abs(fb));',
+      '  diffuseColor.rgb = mix(col, vec3(0.5,0.51,0.55), covered); eyeEmit *= 1.0 - covered; isEye *= 1.0 - covered;',
+      '}',
+      '#endif'].join('\n');
+    headSkin.onBeforeCompile = (sh)=>{
+      sh.uniforms.uHeadInv = headInv; sh.uniforms.uJawB = jawB; sh.uniforms.uFlow = flowU; sh.uniforms.uBlink = blinkU; sh.uniforms.uScroll = scrollU; sh.uniforms.uBodyMap = { value: bodyMap }; sh.uniforms.uBodyNrm = { value: bodyNrm };
+      const MS = 0.5920122;
+      /* soften the sculpt: lean outer-surface normals toward a smooth tube round the head axis, so it shines like the body */
+      const smoothN = ['vec3 dpz = vec3(mp.x, q.y, q.x); float hcyV = mix(-0.17, 0.0, smoothstep(-0.8, 0.0, dpz.z));', 'vec3 radN = normalize(vec3(dpz.x, dpz.y - hcyV, 0.0) + 1e-4);', 'float outer = smoothstep(0.1, 0.5, dot(objectNormal, radN)) * (1.0 - step(0.78, uv.x)*step(uv.y, 0.45));', 'objectNormal = normalize(mix(objectNormal, radN, 0.5*outer));'].join('\n');
+      sh.vertexShader = sh.vertexShader
+        .replace('#include <common>', '#include <common>\nvarying vec3 vWP;\nvarying vec3 vMP;\nvarying vec3 vDP;\nvarying float vHeadU;\nuniform float uJawB;\nvec2 rotZY(vec2 p, vec2 c, float a){ vec2 d = p - c; float cs = cos(a), sn = sin(a); return c + vec2(d.x*cs - d.y*sn, d.x*sn + d.y*cs); }')
+        .replace('#include <beginnormal_vertex>', [
+          '#include <beginnormal_vertex>',
+          'vec3 mp = position * ' + f3(MS) + ';',
+          'vMP = mp;',
+          'float w1 = smoothstep(-0.75, -0.25, mp.z);',
+          'float phi = atan(mp.y - ' + f3(JAW.hy) + ', mp.z - ' + f3(JAW.hz) + ');',
+          'float wl = smoothstep(-0.3, 0.1, mp.z) * (1.0 - smoothstep(-0.3, 0.32, phi));',
+          'float a1 = -' + f3(JAW.A) + '*w1, a2 = (' + f3(JAW.A) + ' + uJawB)*wl;',
+          'vec2 q = rotZY(mp.zy, vec2(' + f3(JAW.nz) + ',' + f3(JAW.ny) + '), a1);',
+          'q = rotZY(q, vec2(' + f3(HZ1) + ',' + f3(HY1) + '), a2);',
+          'vec3 dpos = vec3(mp.x, q.y, q.x) / ' + f3(MS) + ';',
+          'vDP = vec3(mp.x, q.y, q.x);',
+          'objectNormal = vec3(objectNormal.x, rotZY(objectNormal.zy, vec2(0.0), a1 + a2).yx);',
+          smoothN,
+          'vHeadU = ' + f3(SNAKE.uCut) + ' + (mp.z - ' + f3(NECK_Z) + ')*' + f3(hs/SNAKE.len) + ';'].join('\n'))
+        .replace('#include <begin_vertex>', 'vec3 transformed = dpos;')
+        .replace('#include <project_vertex>', '#include <project_vertex>\nvWP = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vWP;\nvarying vec3 vMP;\nvarying vec3 vDP;\nvarying float vHeadU;\nuniform mat4 uHeadInv;\nuniform float uFlow;\nuniform float uBlink;\nuniform float uScroll;\nuniform sampler2D uBodyMap;\nuniform sampler2D uBodyNrm;\nvec2 uvS;')
+        .replace('#include <clipping_planes_fragment>', '#include <clipping_planes_fragment>\nfloat fadeK = ((uHeadInv * vec4(vWP, 1.0)).z - ' + HEAD_CUT.toFixed(3) + ')/' + HEAD_FADE.toFixed(3) + ';\nif(fadeK < fract(52.9829189*fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715))))) discard;')
+        .replace('#include <map_fragment>', headSkinChunk.replace('HEAD_TPM', (hs*bodyMap.repeat.x/SNAKE.len).toFixed(5)) + '\n' + eyeChunk)
+        .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, 0.035, isEye);')
+        .replace('#include <normal_fragment_maps>', headNormalChunk)
+        .replace('#include <clearcoat_normal_fragment_maps>', 'clearcoatNormal = normal;')
+        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\nfloat ph = fract(vHeadU*14.0 + uFlow*0.55);\nfloat band = smoothstep(0.0,0.03,ph)*(1.0-smoothstep(0.03,0.12,ph));\ntotalEmissiveRadiance += eyeEmit;');
+    };
+    const headHolder = new T.Group(); spin.add(headHolder);
+    headHolder.quaternion.setFromRotationMatrix(new T.Matrix4().makeBasis(sideV, up, fwd));
+    headHolder.scale.setScalar(hs);
+    headHolder.position.copy(headPos);
+    if(T.GLTFLoader){
+      new T.GLTFLoader().load('assets/models/snake-head/scene.gltf', (g)=>{
+        g.scene.traverse(o=>{
+          if(!o.isMesh) return;
+          const src = o.material;
+          headSkin.map = src.map || null;
+          if(src.normalMap){ headSkin.normalMap = headSkin.clearcoatNormalMap = src.normalMap; headSkin.normalScale.copy(src.normalScale).multiplyScalar(1.3); headSkin.clearcoatNormalScale.copy(headSkin.normalScale); }
+          headSkin.needsUpdate = true;
+          o.material = headSkin;
+          o.onBeforeRender = ()=>{ headInv.value.copy(headHolder.matrixWorld).invert(); };
+        });
+        headHolder.add(g.scene);
+        /* warm up while still off screen: compile both shaders and upload every texture now, not on the intro's first frames */
+        const vb = bodyMesh.visible, vh = headHolder.visible; bodyMesh.visible = headHolder.visible = true;
+        try{ renderer.compile(scene, camera); if(renderer.initTexture) [bodyMap, bodyNrm, headSkin.map, headSkin.normalMap].forEach(tx => tx && renderer.initTexture(tx)); }catch(_){}
+        bodyMesh.visible = vb; headHolder.visible = vh;
+        headReady = true;
+      });
+    }
+    /* intro: the snake crawls in from off screen along a lead-in path, ties itself into the knot and bites its tail.
+       Every ring keeps its cross-section in its own frame and slides along one rail (lead-in, then the knot);
+       the head rides rigidly on the neck ring, so the last frame is exactly the resting pose. */
+    /* resting view: the pretzel face-on, loop start at the bottom, a slight tilt for depth */
+    const REST_ROT = new T.Euler().setFromQuaternion(new T.Quaternion().setFromAxisAngle(new T.Vector3(1, 0, 0), 0.12).multiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(0, 0, 1), -Math.PI/2 - Math.atan2(tailP.y, tailP.x))));
+    /* ---------- motion: the snake travels the closed pretzel loop forever, head chasing its own tail.
+       One rail: a lead-in from off screen (sigma < 0) that joins the loop, then the loop itself (periodic).
+       Every body ring rides the rail; the head is rigid on the front, its top always turned to the viewer. ---------- */
+    const intro = (function(){
+      const qInv = new T.Quaternion().setFromEuler(REST_ROT).invert();
+      const viewL = new T.Vector3(0, 0, 1).applyQuaternion(qInv);
+      /* loop rail, resampled evenly by arc length */
+      const M = 6000, raw = [], acc = [0];
+      for(let k = 0; k <= M; k++){ raw.push(knotPoint(k/M, new T.Vector3())); if(k) acc.push(acc[k-1] + raw[k].distanceTo(raw[k-1])); }
+      const LP = acc[M], KL = Math.round(LP/0.01), HL = LP/KL;
+      const lP = new Float32Array(KL*3), lT = new Float32Array(KL*3), lN = new Float32Array(KL*3);
+      { let j = 1; const v = new T.Vector3();
+        for(let k = 0; k < KL; k++){ const s = k*HL; while(acc[j] < s) j++; const f = (s - acc[j-1])/(acc[j]-acc[j-1]); v.copy(raw[j-1]).lerp(raw[j], f); v.toArray(lP, k*3); } }
+      const tv = new T.Vector3(), nv = new T.Vector3();
+      for(let k = 0; k < KL; k++){
+        const a = ((k+1)%KL)*3, b = ((k-1+KL)%KL)*3;
+        tv.set(lP[a]-lP[b], lP[a+1]-lP[b+1], lP[a+2]-lP[b+2]).normalize(); tv.toArray(lT, k*3);
+        nv.copy(viewL).addScaledVector(tv, -viewL.dot(tv)).normalize(); nv.toArray(lN, k*3);
+      }
+      /* the snake, measured from the tail tip: body on the rail up to the neck anchor LB, rigid head beyond */
+      const SNOUT = (0.95 - NECK_Z)*hs, GAP = 0.1, LB = LP - SNOUT - GAP, END_R = NECK_R*hs, BLEND = 0.75;
+      /* lead-in: leaves the loop start backwards, swings toward the lower right of the screen, then snakes off it */
+      const dOutL = new T.Vector3(1, -0.55, 0.2).normalize().applyQuaternion(qInv);
+      const sideL = new T.Vector3().crossVectors(dOutL, viewL).normalize();
+      const p0 = new T.Vector3().fromArray(lP, 0), t0 = new T.Vector3().fromArray(lT, 0);
+      /* steer, never snap: walk backwards from the loop start, turning toward the exit direction at a limited rate (no hard corners) */
+      const EL = LB + 5;
+      const eRaw = [p0.clone()], eAcc = [0];
+      const pushE = (p)=>{ eAcc.push(eAcc[eAcc.length-1] + p.distanceTo(eRaw[eRaw.length-1])); eRaw.push(p); };
+      { const dir = t0.clone().negate(), pt = p0.clone(), STEP = 0.01, TURN = 0.55*STEP, axis = new T.Vector3(), q = new T.Quaternion();
+        let straight = 0, walked = 0;
+        while(walked < EL + 1){
+          const ang = dir.angleTo(dOutL);
+          if(ang > 1e-4){ axis.crossVectors(dir, dOutL); if(axis.lengthSq() < 1e-10) axis.copy(viewL); axis.normalize(); q.setFromAxisAngle(axis, Math.min(ang, TURN)); dir.applyQuaternion(q).normalize(); }
+          else straight += STEP;
+          pt.addScaledVector(dir, STEP); walked += STEP;
+          const ramp = Math.min(1, straight/2.0), w = Math.sin(straight/2.3*Math.PI*2)*0.42*ramp*ramp*(3-2*ramp);
+          pushE(pt.clone().addScaledVector(sideL, w));
+        } }
+      const KE = Math.round(EL/0.01), HE = EL/KE;
+      const eP = new Float32Array((KE+1)*3), eT = new Float32Array((KE+1)*3), eN = new Float32Array((KE+1)*3);
+      { let j = 1; const v = new T.Vector3();
+        for(let k = 0; k <= KE; k++){ const s = k*HE; while(j < eAcc.length-1 && eAcc[j] < s) j++; const f = Math.min(1, (s - eAcc[j-1])/(eAcc[j]-eAcc[j-1])); v.copy(eRaw[j-1]).lerp(eRaw[j], f); v.toArray(eP, k*3); } }
+      for(let k = 0; k <= KE; k++){
+        /* tangent points toward the loop (decreasing lead-in distance) */
+        const a = Math.max(0, k-1)*3, b = Math.min(KE, k+1)*3;
+        tv.set(eP[a]-eP[b], eP[a+1]-eP[b+1], eP[a+2]-eP[b+2]).normalize(); if(k === 0) tv.copy(t0); tv.toArray(eT, k*3);
+        nv.copy(viewL).addScaledVector(tv, -viewL.dot(tv)).normalize(); nv.toArray(eN, k*3);
+      }
+      const F = { c: new T.Vector3(), t: new T.Vector3(), n: new T.Vector3(), b: new T.Vector3() };
+      function frameAt(sg){
+        let P, Tt, Nn, x;
+        if(sg >= 0){ x = (sg % LP)/HL; P = lP; Tt = lT; Nn = lN; }
+        else { x = Math.min(KE - 0.001, -sg/HE); P = eP; Tt = eT; Nn = eN; }
+        const k = Math.floor(x), f = x - k, a = k*3, b = (sg >= 0 ? ((k+1) % KL) : k+1)*3;
+        F.c.set(P[a]+(P[b]-P[a])*f, P[a+1]+(P[b+1]-P[a+1])*f, P[a+2]+(P[b+2]-P[a+2])*f);
+        F.t.set(Tt[a]+(Tt[b]-Tt[a])*f, Tt[a+1]+(Tt[b+1]-Tt[a+1])*f, Tt[a+2]+(Tt[b+2]-Tt[a+2])*f).normalize();
+        F.n.set(Nn[a]+(Nn[b]-Nn[a])*f, Nn[a+1]+(Nn[b+1]-Nn[a+1])*f, Nn[a+2]+(Nn[b+2]-Nn[a+2])*f);
+        F.n.addScaledVector(F.t, -F.n.dot(F.t)).normalize(); F.b.crossVectors(F.t, F.n);
+        return F;
+      }
+      /* rings */
+      const NECKT = [[-1.15,-0.17,0.245,0.245],[-1.0,-0.165,0.28,0.295],[-0.9,-0.125,0.28,0.305],[-0.8,-0.075,0.28,0.305],[-0.7,-0.03,0.26,0.32],[-0.6,0.04,0.25,0.35]];
+      const neckAt = (z)=>{ for(let n = 1; n < NECKT.length; n++){ if(z <= NECKT[n][0]){ const A = NECKT[n-1], B = NECKT[n], f = (z-A[0])/(B[0]-A[0]); return A.map((v,m)=> v + (B[m]-v)*f); } } return NECKT[NECKT.length-1]; };
+      const sst = (a, b, x)=>{ const t = Math.min(1, Math.max(0, (x-a)/(b-a))); return t*t*(3-2*t); };
+      const ringS = [], ringR = [];                     /* rail rings: body arc position, radius */
+      for(let s = 0; s < LB; s += 0.02){ ringS.push(s); }
+      ringS.push(LB);
+      ringS.forEach(s => { let r = 0.012 + (MAXR - 0.012)*sst(0, 2.4, s); r += (END_R - r)*sst(LB - 1.0, LB, s); ringR.push(r); });
+      const rig = [];                                   /* rigid rings in head-model space: z, centre y, rx, ry, inner */
+      for(let z = NECK_Z + 0.025; z <= HEAD_CUT + HEAD_FADE + 0.01; z += 0.025){ const [, yc, hx, hy] = neckAt(z), g = 1.03 - 0.04*sst(HEAD_CUT, HEAD_CUT + HEAD_FADE, z); rig.push([z, yc, hx*g, hy*g, 0]); }
+      { const z0 = rig[rig.length-1][0], [, yc0, hx0, hy0] = neckAt(z0);
+        for(let n = 1; n <= 14; n++){ const f = n/14, e = f*f*(3-2*f), sc = 1 - 0.5*e; rig.push([z0 + (GUL_Z - z0)*f, yc0 + (GUL_Y - yc0)*e, hx0*0.99*sc, hy0*0.99*sc, Math.min(1, f*3)]); }
+        [0.75, 0.4, 0.001].forEach((c, n)=> rig.push([GUL_Z + 0.012*(n+1), GUL_Y, hx0*0.99*0.5*c, hy0*0.99*0.5*c, 1])); }
+      const NRR = ringS.length, NRG = rig.length, NRT = NRR + NRG, VPR = RAD + 1;
+      const LTOT = LB + (rig[NRG-1][0] - NECK_Z)*hs;
+      SNAKE.len = LTOT; SNAKE.uCut = LB/LTOT;
+      const rep = Math.max(1, Math.round(LTOT/TILE_LEN));
+      bodyMap.repeat.set(rep, 1); bodyNrm.repeat.copy(bodyMap.repeat); bodyMap.offset.set(0, 0); bodyNrm.offset.set(0, 0);
+      scrollU.value = rep*(LB - NECK_Z*hs)/LTOT;
+      const pos = new Float32Array(NRT*VPR*3), nor = new Float32Array(NRT*VPR*3), tan = new Float32Array(NRT*VPR*3), uv = new Float32Array(NRT*VPR*2), inn = new Float32Array(NRT*VPR);
+      const cs = new Float32Array(VPR), sn = new Float32Array(VPR);
+      for(let j = 0; j < VPR; j++){ cs[j] = Math.cos(j/RAD*Math.PI*2); sn[j] = Math.sin(j/RAD*Math.PI*2); }
+      for(let i = 0; i < NRT; i++){
+        const sB = i < NRR ? ringS[i] : LB + (rig[i-NRR][0] - NECK_Z)*hs, inner = i < NRR ? 0 : rig[i-NRR][4];
+        for(let j = 0; j < VPR; j++){ const o = i*VPR + j; uv[o*2] = sB/LTOT; uv[o*2+1] = j/RAD; inn[o] = inner; }
+      }
+      const idx = [];
+      for(let i = 0; i < NRT-1; i++) for(let j = 0; j < RAD; j++){ const a = i*VPR + j, b = a + VPR; idx.push(a, b, a+1, b, b+1, a+1); }
+      const geo = new T.BufferGeometry();
+      geo.setAttribute('position', new T.BufferAttribute(pos, 3).setUsage(T.DynamicDrawUsage));
+      geo.setAttribute('normal', new T.BufferAttribute(nor, 3).setUsage(T.DynamicDrawUsage));
+      geo.setAttribute('aTan', new T.BufferAttribute(tan, 3).setUsage(T.DynamicDrawUsage));
+      geo.setAttribute('uv', new T.BufferAttribute(uv, 2));
+      geo.setAttribute('aInner', new T.BufferAttribute(inn, 1));
+      geo.setIndex(idx);
+      geo.boundingSphere = new T.Sphere(new T.Vector3(), 50);
+      bodyMesh.geometry = geo;
+      /* head frame: looks a little way back along the neck so head and neck turn as one */
+      const HM = new T.Matrix4(), HQ = new T.Quaternion(), hc1 = new T.Vector3(), hn1 = new T.Vector3(), ht1 = new T.Vector3(), hc0 = new T.Vector3();
+      const hFwd = new T.Vector3(), hUp = new T.Vector3(), hSide = new T.Vector3(), hPos = new T.Vector3(), perp = new T.Vector3(), hScale = new T.Vector3(hs, hs, hs);
+      let wAmp = 0, wPh = 0;
+      const waveAt = (sB)=> wAmp*Math.sin(sB*2.6 - wPh)*Math.min(1, Math.max(0, (LB - sB)/1.2 + 0.25));
+      function place(s){
+        let f = frameAt(s + LB); hc1.copy(f.c); hn1.copy(f.n); ht1.copy(f.t);
+        /* aim the head at the point on the path where its snout belongs, so the head follows the curve instead of shooting off it */
+        f = frameAt(s + LB + SNOUT*0.9); hc0.copy(f.c);
+        hFwd.copy(hc0).sub(hc1).normalize();
+        hUp.copy(hn1).addScaledVector(hFwd, -hn1.dot(hFwd)).normalize(); hSide.crossVectors(hUp, hFwd);
+        perp.crossVectors(hFwd, viewL).normalize();
+        hPos.copy(hc1).addScaledVector(perp, waveAt(LB)).addScaledVector(hUp, -NECK_Y*hs).addScaledVector(hFwd, -NECK_Z*hs);
+        HM.makeBasis(hSide, hUp, hFwd); HQ.setFromRotationMatrix(HM);
+        headHolder.position.copy(hPos); headHolder.quaternion.copy(HQ); headHolder.scale.copy(hScale);
+        const sx = hSide.x, sy = hSide.y, sz = hSide.z, ux = hUp.x, uy = hUp.y, uz = hUp.z, fx = hFwd.x, fy = hFwd.y, fz = hFwd.z;
+        /* rail rings, blending into the head's rigid frame over the last stretch of neck */
+        for(let i = 0; i < NRR; i++){
+          const sB = ringS[i], r = ringR[i], d = LB - sB, wR = d < BLEND ? 1 - sst(0, BLEND, d) : 0;
+          f = frameAt(s + sB);
+          perp.crossVectors(f.t, viewL).normalize();
+          const w = waveAt(sB);
+          const cx = f.c.x + perp.x*w, cy = f.c.y + perp.y*w, cz = f.c.z + perp.z*w;
+          /* rigid twin: straight back from the neck anchor along the head axis */
+          const mz = (NECK_Z - d/hs)*hs, my = NECK_Y*hs;
+          const gx = hPos.x + ux*my + fx*mz, gy = hPos.y + uy*my + fy*mz, gz = hPos.z + uz*my + fz*mz;
+          const Nx = f.n.x, Ny = f.n.y, Nz = f.n.z, Bx = f.b.x, By = f.b.y, Bz = f.b.z;
+          for(let j = 0; j < VPR; j++){
+            const o = (i*VPR + j)*3, c = cs[j], sN = sn[j];
+            let qx = Nx*c + Bx*sN, qy = Ny*c + By*sN, qz = Nz*c + Bz*sN;
+            let px = cx + qx*r, py = cy + qy*r, pz = cz + qz*r;
+            if(wR > 0){
+              const kx = ux*c - sx*sN, ky = uy*c - sy*sN, kz = uz*c - sz*sN;
+              px += (gx + kx*r - px)*wR; py += (gy + ky*r - py)*wR; pz += (gz + kz*r - pz)*wR;
+              qx += (kx - qx)*wR; qy += (ky - qy)*wR; qz += (kz - qz)*wR;
+            }
+            pos[o] = px; pos[o+1] = py; pos[o+2] = pz; nor[o] = qx; nor[o+1] = qy; nor[o+2] = qz;
+            tan[o] = f.t.x; tan[o+1] = f.t.y; tan[o+2] = f.t.z;
+          }
+        }
+        /* rigid rings inside the head: neck up to the skull, then the gullet */
+        for(let n = 0; n < NRG; n++){
+          const [z, yc, rx0, ry0] = rig[n], rx = rx0*hs, ry = ry0*hs, my = yc*hs, mz = z*hs;
+          const cx = hPos.x + ux*my + fx*mz, cy = hPos.y + uy*my + fy*mz, cz = hPos.z + uz*my + fz*mz;
+          for(let j = 0; j < VPR; j++){
+            const o = ((NRR + n)*VPR + j)*3, c = cs[j], sN = sn[j];
+            pos[o] = cx + ux*c*ry - sx*sN*rx; pos[o+1] = cy + uy*c*ry - sy*sN*rx; pos[o+2] = cz + uz*c*ry - sz*sN*rx;
+            let qx = ux*c/ry - sx*sN/rx, qy = uy*c/ry - sy*sN/rx, qz = uz*c/ry - sz*sN/rx; const l = Math.hypot(qx, qy, qz) || 1;
+            nor[o] = qx/l; nor[o+1] = qy/l; nor[o+2] = qz/l; tan[o] = fx; tan[o+1] = fy; tan[o+2] = fz;
+          }
+        }
+        geo.attributes.position.needsUpdate = true; geo.attributes.normal.needsUpdate = true; geo.attributes.aTan.needsUpdate = true;
+      }
+      /* timing: a fast entrance off screen that eases down to an unhurried cruise round the loop */
+      const V_CRUISE = 0.32, T_IN = 9.0, S_START = -(LB + 3.2);
+      const V0 = 2*((-S_START + 0.6) - V_CRUISE*T_IN)/T_IN + V_CRUISE;
+      const st = { active: false, done: false, t: 0, s: 0, rot: REST_ROT };
+      st.start = ()=>{ st.active = true; st.done = false; st.t = 0; st.s = S_START; spin.rotation.copy(REST_ROT); place(st.s); bodyMesh.visible = true; headHolder.visible = true; };
+      st.update = (dt)=>{
+        st.t += dt; const k = Math.min(1, st.t/T_IN), e = k*k*(3-2*k);
+        const v = V0 + (V_CRUISE - V0)*e;
+        st.s += v*dt;
+        wAmp = 0.07*Math.min(1, st.t/0.6)*(0.35 + 0.65*(1 - e)); wPh += dt*5.5*(0.4 + 0.6*(v/V0));
+        spin.rotation.copy(REST_ROT);
+        place(st.s);
+        if(k >= 1){ st.active = false; st.done = true; }
+        return k;
+      };
+      st.cruise = (dt)=>{ st.s += V_CRUISE*dt; wAmp *= Math.pow(0.5, dt); wPh += dt*2.2; place(st.s); };
+      st.hide = ()=>{ bodyMesh.visible = false; headHolder.visible = false; };
+      st.rest = ()=>{ st.s = LP*0.5; st.done = true; place(st.s); };
+      return st;
+    })();
+    if(!skipIntro) intro.hide(); else { spin.rotation.copy(REST_ROT); intro.rest(); }
+    let introWait = 0, settle = 0, pageLoaded = false;
+    (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(()=>{ pageLoaded = true; }); const restX = skipIntro ? 0.35 : intro.rot.x;
+
+    function dotTexture(){
+      const c = document.createElement('canvas'); c.width = c.height = 64;
+      const g = c.getContext('2d'); const gr = g.createRadialGradient(32,32,0,32,32,32);
+      gr.addColorStop(0,'rgba(255,255,255,1)'); gr.addColorStop(.35,'rgba(255,255,255,.75)'); gr.addColorStop(1,'rgba(255,255,255,0)');
+      g.fillStyle = gr; g.fillRect(0,0,64,64);
+      return new T.CanvasTexture(c);
+    }
+    const sprite = dotTexture();
+    const white = new T.Color(0xe9eaee), redC = new T.Color(0xff3a26);
+
+    const N = 4200;
+    const home = new Float32Array(N*3), pos = new Float32Array(N*3), vel = new Float32Array(N*3), col = new Float32Array(N*3), seed = new Float32Array(N);
+    for(let i=0;i<N;i++){
+      const k = Math.floor(Math.random()*SEG);
+      const th = Math.random()*Math.PI*2, off = radiusAt(k/SEG*BODY_END) + 0.05 + Math.pow(Math.random(), 2.3)*0.75;
+      const nx = nrms[k].x*Math.cos(th) + bins[k].x*Math.sin(th), ny = nrms[k].y*Math.cos(th) + bins[k].y*Math.sin(th), nz = nrms[k].z*Math.cos(th) + bins[k].z*Math.sin(th);
+      home[i*3]=pos[i*3]=pts[k].x+nx*off; home[i*3+1]=pos[i*3+1]=pts[k].y+ny*off; home[i*3+2]=pos[i*3+2]=pts[k].z+nz*off;
+      const cc = Math.random() < 0.12 ? redC : white;
+      col[i*3]=cc.r; col[i*3+1]=cc.g; col[i*3+2]=cc.b; seed[i] = Math.random()*100;
+    }
+    const haloGeo = new T.BufferGeometry();
+    haloGeo.setAttribute('position', new T.BufferAttribute(pos, 3));
+    haloGeo.setAttribute('color', new T.BufferAttribute(col, 3));
+    const haloMat = new T.PointsMaterial({size:0.045, map:sprite, vertexColors:true, transparent:true, opacity:skipIntro ? 0.9 : 0, depthWrite:false, blending:T.AdditiveBlending});
+    spin.add(new T.Points(haloGeo, haloMat));
+
+    const D = 1300;
+    const dPos = new Float32Array(D*3), dHome = new Float32Array(D*3), dVel = new Float32Array(D*3);
+    for(let i=0;i<D;i++){
+      const x = (Math.random()-0.5)*16, y = (Math.random()-0.5)*9, z = (Math.random()-0.5)*6 - 1;
+      dHome[i*3]=dPos[i*3]=x; dHome[i*3+1]=dPos[i*3+1]=y; dHome[i*3+2]=dPos[i*3+2]=z;
+    }
+    const dustGeo = new T.BufferGeometry(); dustGeo.setAttribute('position', new T.BufferAttribute(dPos, 3));
+    scene.add(new T.Points(dustGeo, new T.PointsMaterial({size:0.04, map:sprite, color:0xc9c9d0, transparent:true, opacity:0.4, depthWrite:false, blending:T.AdditiveBlending})));
+
+    let W=1, H=1; const anchor = new T.Vector3();
+    function layout(){
+      const r = stage.getBoundingClientRect(); W = Math.max(1, r.width); H = Math.max(1, r.height);
+      renderer.setSize(W, H, false); camera.aspect = W/H; camera.updateProjectionMatrix();
+      const vh = 2*Math.tan(T.MathUtils.degToRad(camera.fov/2))*camera.position.z, vw = vh*camera.aspect;
+      if(W > 860){ anchor.set(vw*0.26, 0, 0); holder.scale.setScalar(1.12); }
+      else { anchor.set(vw*0.12, vh*0.22, -2); holder.scale.setScalar(0.85); }
+      holder.position.copy(anchor);
+    }
+    layout(); addEventListener('resize', layout);
+
+    const ndc = new T.Vector2(9, 9), ray = new T.Raycaster(), plane = new T.Plane(new T.Vector3(0,0,1), 0);
+    const cursorW = new T.Vector3(99,99,99), cursorL = new T.Vector3();
+    let pointerIn = false, dragging = false, lastX = 0, lastY = 0, velY = 0, velX = 0;
+    hero.addEventListener('pointermove', (e)=>{
+      const r = stage.getBoundingClientRect();
+      ndc.set(((e.clientX-r.left)/r.width)*2-1, -((e.clientY-r.top)/r.height)*2+1); pointerIn = true;
+    }, {passive:true});
+    hero.addEventListener('pointerleave', ()=>{ pointerIn = false; });
+    stage.addEventListener('pointerdown', (e)=>{
+      if(intro.active) return;
+      dragging = true; lastX = e.clientX; lastY = e.clientY; velX = velY = 0;
+      try{ stage.setPointerCapture(e.pointerId); }catch(_){}
+      stage.classList.add('grabbing'); e.preventDefault();
+    });
+    stage.addEventListener('pointermove', (e)=>{
+      if(!dragging) return;
+      const dx = e.clientX - lastX, dy = e.clientY - lastY; lastX = e.clientX; lastY = e.clientY;
+      spin.rotation.y += dx*0.009; spin.rotation.x += dy*0.007;
+      velY = dx*0.5; velX = dy*0.4;
+    });
+    const endDrag = (e)=>{ if(!dragging) return; dragging = false; stage.classList.remove('grabbing'); try{ stage.releasePointerCapture(e.pointerId); }catch(_){} };
+    stage.addEventListener('pointerup', endDrag); stage.addEventListener('pointercancel', endDrag);
+    stage.addEventListener('keydown', (e)=>{ if(e.key==='ArrowLeft') velY -= 3; if(e.key==='ArrowRight') velY += 3; });
+
+    let last = performance.now(), running = true, raf = null;
+    function frame(now){
+      const dt = Math.min(0.05, (now-last)/1000); last = now; const t = now/1000;
+      if(headReady){ perfF++; if(dt > 0.026) slowF++; if(perfF >= 90){ if(slowF > 45 && curPR > 0.75){ curPR = Math.max(0.75, curPR - 0.25); renderer.setPixelRatio(curPR); layout(); } perfF = 0; slowF = 0; } }
+      plane.constant = -holder.position.z;
+      if(pointerIn){ ray.setFromCamera(ndc, camera); if(!ray.ray.intersectPlane(plane, cursorW)) cursorW.set(99,99,99); }
+      else cursorW.set(99,99,99);
+
+      if(!skipIntro && !intro.done && !intro.active){ introWait += dt; if(headReady && pageLoaded){ settle += dt; if(settle > 0.6) intro.start(); } else if(introWait > 7) intro.start(); }
+      if(intro.active){ intro.update(dt); haloMat.opacity = 0.9*Math.min(1, Math.max(0, (intro.t - 4.5)/2.5)); }
+      else if(intro.done) intro.cruise(dt);
+      if(!intro.active && !dragging){
+        /* rest on the pretzel pose with a slow sway; after a drag, glide back to it */
+        spin.rotation.y += velY*dt; spin.rotation.x += velX*dt;
+        velY *= Math.pow(0.06, dt); velX *= Math.pow(0.04, dt);
+        const ty = REST_ROT.y + Math.sin(t*0.22)*0.28, tx = REST_ROT.x + Math.sin(t*0.17)*0.08;
+        const wrapA = (a)=> a - Math.PI*2*Math.round(a/(Math.PI*2));
+        spin.rotation.y = ty + wrapA(spin.rotation.y - ty); spin.rotation.x = tx + wrapA(spin.rotation.x - tx);
+        const kR = Math.min(1, dt*0.9);
+        spin.rotation.y += (ty - spin.rotation.y)*kR; spin.rotation.x += (tx - spin.rotation.x)*kR; spin.rotation.z += (REST_ROT.z - spin.rotation.z)*kR;
+      }
+      flowU.value = t;
+      /* blink every few seconds */
+      const bt = t % 4.6; blinkU.value = Math.max(0, 1 - Math.abs(bt - 0.18)/0.13);
+      holder.position.y = anchor.y + Math.sin(t*0.9)*0.06;
+
+
+      spin.updateMatrixWorld(true);
+      cursorL.copy(cursorW); spin.worldToLocal(cursorL);
+      const R = 1.0/holder.scale.x, R2 = R*R;
+      for(let i=0;i<N;i++){
+        const ix=i*3, iy=ix+1, iz=ix+2;
+        const dx = pos[ix]-cursorL.x, dy = pos[iy]-cursorL.y, dz = pos[iz]-cursorL.z, d2 = dx*dx+dy*dy+dz*dz;
+        if(d2 < R2){ const d = Math.sqrt(d2)+1e-4, f = (1-d/R)*0.9; vel[ix]+=dx/d*f*dt*6; vel[iy]+=dy/d*f*dt*6; vel[iz]+=dz/d*f*dt*6; }
+        const w = 0.004*Math.sin(t*0.8+seed[i]);
+        vel[ix] += ((home[ix]+w)-pos[ix])*dt*2.2; vel[iy] += ((home[iy]+w)-pos[iy])*dt*2.2; vel[iz] += (home[iz]-pos[iz])*dt*2.2;
+        vel[ix]*=0.9; vel[iy]*=0.9; vel[iz]*=0.9;
+        pos[ix]+=vel[ix]; pos[iy]+=vel[iy]; pos[iz]+=vel[iz];
+      }
+      haloGeo.attributes.position.needsUpdate = true;
+
+      for(let i=0;i<D;i++){
+        const ix=i*3, iy=ix+1;
+        dHome[iy] += dt*0.05; if(dHome[iy] > 4.5){ dHome[iy] = -4.5; dPos[iy] = -4.5; }
+        const dx = dPos[ix]-cursorW.x, dy = dPos[iy]-cursorW.y, d2 = dx*dx+dy*dy;
+        if(d2 < 1.6){ const d = Math.sqrt(d2)+1e-4, f = (1-d/1.26); dVel[ix]+=dx/d*f*dt*3; dVel[iy]+=dy/d*f*dt*3; }
+        dVel[ix] += (dHome[ix]-dPos[ix])*dt*0.8; dVel[iy] += (dHome[iy]-dPos[iy])*dt*0.8;
+        dVel[ix]*=0.92; dVel[iy]*=0.92;
+        dPos[ix]+=dVel[ix]; dPos[iy]+=dVel[iy];
+      }
+      dustGeo.attributes.position.needsUpdate = true;
+
+      redLight.position.x = anchor.x + 3.2 + Math.sin(t*0.4)*0.9;
+      renderer.render(scene, camera);
+      if(running) raf = requestAnimationFrame(frame);
+    }
+
+    if(reduced){ spin.rotation.copy(REST_ROT); renderer.render(scene, camera); return; }
+    new IntersectionObserver((en)=>{
+      const vis = en[0].isIntersecting;
+      if(vis && !running){ running = true; last = performance.now(); raf = requestAnimationFrame(frame); }
+      else if(!vis && running){ running = false; if(raf) cancelAnimationFrame(raf); }
+    }, {threshold:0.02}).observe(hero);
+    document.addEventListener('visibilitychange', ()=>{ if(document.hidden){ running = false; if(raf) cancelAnimationFrame(raf); } else if(!running){ running = true; last = performance.now(); raf = requestAnimationFrame(frame); } });
+    raf = requestAnimationFrame(frame);
   })();
 
   /* ---------- custom cursor: follow + morph into a word on hover ---------- */
@@ -971,28 +1713,209 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
   rmQuery.addEventListener('change', (e)=>{ if(e.matches) pinToFinalStates(); });
   if(rmQuery.matches) pinToFinalStates();
 
-  /* ---------- stat count-up ---------- */
-  const statEls = document.querySelectorAll('.stat-num [data-count]');
-  const statIO = new IntersectionObserver((entries)=>{
-    entries.forEach(e=>{
-      if(!e.isIntersecting) return;
-      statIO.unobserve(e.target);
-      const target = parseInt(e.target.dataset.count, 10);
-      if(rmQuery.matches){ e.target.textContent = target.toLocaleString('en-US'); return; }
-      const dur = 1100, start = performance.now();
-      function tick(now){
-        const t = Math.min(1, (now-start)/dur);
-        const eased = 1 - Math.pow(1-t, 3);
-        e.target.textContent = Math.round(target*eased).toLocaleString('en-US');
-        if(t < 1) requestAnimationFrame(tick);
+  /* ---------- scroll progress: a thin red wiggly snake line down the left edge ---------- */
+  (function(){
+    const cv = document.getElementById('snakeBar'); if(!cv) return;
+    const g = cv.getContext('2d'), W = 24;
+    let H = 0, dpr = 1;
+    function size(){ dpr = Math.min(2, devicePixelRatio || 1); H = innerHeight; cv.width = W*dpr; cv.height = H*dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px'; }
+    size(); addEventListener('resize', size);
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let p = 0, phase = 0, last = performance.now();
+    function draw(now){
+      const dt = Math.min(0.05, (now - last)/1000); last = now;
+      const max = document.documentElement.scrollHeight - innerHeight;
+      const target = max > 0 ? Math.min(1, Math.max(0, scrollY/max)) : 0;
+      p += (target - p)*Math.min(1, dt*6);
+      if(!still) phase += dt*0.7;
+      g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+      const headY = 10 + p*(H - 20), X = (y)=> 9 + Math.sin(y*0.06 - phase)*3.2;
+      g.strokeStyle = '#e6402f'; g.lineCap = 'round'; g.lineJoin = 'round';
+      for(let y = -6; y < headY; y += 4){
+        const y1 = Math.min(headY, y + 4), k = Math.min(1, (y1 + 6)/(headY + 6));
+        g.lineWidth = 1 + 1.4*k; g.beginPath(); g.moveTo(X(y), y); g.lineTo(X(y1), y1); g.stroke();
       }
-      requestAnimationFrame(tick);
+      g.fillStyle = '#e6402f'; g.beginPath(); g.ellipse(X(headY), headY, 2.4, 3.2, 0, 0, Math.PI*2); g.fill();
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  })();
+  /* ---------- snake details: slithering section dividers, and a short snake that trails the cursor ---------- */
+  (function(){
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    /* dividers: the straight rule at the top of each section becomes a thin silver snake, a red pulse running along it */
+    let d = 'M0 7';
+    for(let x = 40; x <= 4000; x += 40) d += (x === 40 ? ' Q20 2 40 7' : ' T' + x + ' 7');
+    document.querySelectorAll('.section').forEach((sec, i)=>{
+      const r = document.createElement('div'); r.className = 'snake-rule'; r.setAttribute('aria-hidden', 'true');
+      r.innerHTML = '<svg width="4000" height="14" viewBox="0 0 4000 14"><path class="sr-body" d="' + d + '"/><path class="sr-pulse" d="' + d + '" style="animation-delay:' + (-i*1.7) + 's"/></svg>';
+      sec.prepend(r);
     });
-  }, {threshold:0.4});
-  statEls.forEach(el=>statIO.observe(el));
+  })();
+  /* ---------- work deck: layered cards ---------- */
+  (function(){
+    const cards = Array.from(document.querySelectorAll('.work-cards article')); if(!cards.length) return;
+    cards.forEach((c, i)=> c.style.setProperty('--i', i));
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    let ticking = false;
+    function update(){
+      ticking = false;
+      for(let i = 0; i < cards.length - 1; i++){
+        const a = cards[i].getBoundingClientRect(), b = cards[i+1].getBoundingClientRect();
+        const cover = Math.min(1, Math.max(0, (a.bottom - b.top)/Math.max(1, a.height)));
+        const btn = cards[i].firstElementChild;
+        btn.style.transform = cover > 0 ? 'scale(' + (1 - cover*0.05).toFixed(4) + ')' : '';
+        btn.style.filter = cover > 0 ? 'brightness(' + (1 - cover*0.45).toFixed(3) + ')' : '';
+      }
+    }
+    addEventListener('scroll', ()=>{ if(!ticking){ ticking = true; requestAnimationFrame(update); } }, {passive:true});
+    addEventListener('resize', update); update();
+  })();
+  /* ---------- text scramble: copy decodes from random glyphs into the real letters as it comes into view ---------- */
+  (function(){
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const UP = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#%&*+=/<>?', LO = 'abcdefghijklmnopqrstuvwxyz#%&*+=/<>?', DG = '0123456789';
+    const pick = (ch)=>{ const set = /[0-9]/.test(ch) ? DG : (ch === ch.toLowerCase() && ch !== ch.toUpperCase()) ? LO : UP; return set[(Math.random()*set.length)|0]; };
+    const SKIP = '.odo, #hero, script, style, svg, canvas, #focusLabel, #focusResult, [data-noscramble]';
+    function textNodes(el){
+      const out = [], w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, { acceptNode: (n)=> (n.nodeValue.trim() && !(n.parentElement && n.parentElement.closest(SKIP))) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT });
+      while(w.nextNode()) out.push(w.currentNode);
+      return out;
+    }
+    const busy = new WeakMap();
+    function scramble(el, dur){
+      if(busy.get(el)) return;
+      const nodes = textNodes(el); if(!nodes.length) return;
+      const orig = nodes.map(n => n.nodeValue), total = orig.reduce((a, s)=> a + s.length, 0);
+      dur = dur || Math.min(1100, 320 + total*9);
+      const lockH = el.style.minHeight; el.style.minHeight = el.offsetHeight + 'px';
+      busy.set(el, true);
+      let idx = 0; const at = orig.map(s => Array.from(s, ()=> (idx++/Math.max(1, total))*0.75 + Math.random()*0.25));
+      const t0 = performance.now(); let lastSwap = 0;
+      (function step(now){
+        const k = (now - t0)/dur;
+        if(now - lastSwap > 45 || k >= 1){
+          lastSwap = now;
+          nodes.forEach((n, i)=>{ const s = orig[i]; let r = ''; for(let c = 0; c < s.length; c++){ const ch = s[c]; r += (k >= at[i][c] || ch === ' ' || ch === '\n') ? ch : pick(ch); } n.nodeValue = r; });
+        }
+        if(k < 1) requestAnimationFrame(step);
+        else { nodes.forEach((n, i)=> n.nodeValue = orig[i]); el.style.minHeight = lockH; busy.set(el, false); }
+      })(t0);
+    }
+    const SEL = 'h1, h2, h3, h4, p, li, .kicker, .stat-label, .fact span, .fact strong, figcaption, .badge, .tag, .btn, nav a, footer a, label';
+    const all = Array.from(document.querySelectorAll(SEL)).filter(el => !el.closest(SKIP));
+    const tops = all.filter(el => !all.some(o => o !== el && o.contains(el)));
+    const io = new IntersectionObserver((en)=>{ en.forEach(e=>{ if(e.isIntersecting){ io.unobserve(e.target); scramble(e.target); } }); }, { threshold: 0.15 });
+    tops.forEach(el => io.observe(el));
+    document.querySelectorAll('nav a, .btn').forEach(el => el.addEventListener('mouseenter', ()=> scramble(el, 420)));
+  })();
+  /* ---------- partner marquee ---------- */
+  (function(){
+    const box = document.getElementById('brandMarquee');
+    if(!box) return;
+    const items = [...box.children];
+    const half = Math.ceil(items.length/2);
+    box.replaceChildren();
+    [items.slice(0,half), items.slice(half)].forEach(group=>{
+      const track = document.createElement('div'); track.className = 'brand-track';
+      group.forEach(it=>track.appendChild(it));
+      group.forEach(it=>{ const cl = it.cloneNode(true); cl.setAttribute('aria-hidden','true'); cl.querySelectorAll('img').forEach(i=>i.alt=''); track.appendChild(cl); });
+      box.appendChild(track);
+    });
+  })();
+  /* ---------- stat odometers: rolling digits ---------- */
+  (function(){
+    const els = document.querySelectorAll('.odo[data-odo]');
+    function build(el){
+      const target = parseInt(el.dataset.odo, 10);
+      const txt = target.toLocaleString('en-US');
+      el.textContent = '';
+      el.setAttribute('aria-label', txt + (el.dataset.suffix || ''));
+      let di = 0;
+      for(const ch of txt){
+        if(/\d/.test(ch)){
+          const win = document.createElement('span'); win.className = 'odo-d'; win.setAttribute('aria-hidden','true');
+          const strip = document.createElement('span'); strip.className = 'odo-strip';
+          for(let r=0;r<3;r++) for(let n=0;n<10;n++){ const s=document.createElement('span'); s.textContent=n; strip.appendChild(s); }
+          strip.dataset.to = String(20 + parseInt(ch,10));
+          strip.style.transitionDelay = (di*0.09) + 's';
+          win.appendChild(strip); el.appendChild(win); di++;
+        } else {
+          const s = document.createElement('span'); s.className = 'odo-sep'; s.setAttribute('aria-hidden','true'); s.textContent = ch; el.appendChild(s);
+        }
+      }
+      if(el.dataset.suffix){ const sx=document.createElement('span'); sx.className='odo-suffix'; sx.setAttribute('aria-hidden','true'); sx.textContent=el.dataset.suffix; el.appendChild(sx); }
+    }
+    function roll(el){
+      el.querySelectorAll('.odo-strip').forEach(s=>{ s.style.transform = 'translateY(' + (-parseInt(s.dataset.to,10)) + 'em)'; });
+      setTimeout(()=>el.classList.add('done'), rmQuery.matches ? 0 : 1500);
+    }
+    els.forEach(build);
+    if(rmQuery.matches){ els.forEach(el=>{ el.classList.add('instant'); roll(el); }); return; }
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ io.unobserve(e.target); requestAnimationFrame(()=>roll(e.target)); } });
+    }, {threshold:0.5});
+    els.forEach(el=>io.observe(el));
+  })();
 
+  /* ---------- the one interactive moment: hold to focus ---------- */
+  (function(){
+    const holdBtn = document.getElementById('focusHold');
+    if(!holdBtn) return;
+    const holdLabel = document.getElementById('focusLabel');
+    const ringFg = document.getElementById('focusRingFg');
+    const focusResult = document.getElementById('focusResult');
+    const focusDots = document.querySelectorAll('.focus-dot');
+    const CIRC = 339, HOLD_MS = 1800;
+    let holdRaf = null, holdStart = null, holding = false;
+    focusDots.forEach(d=>{ d.dataset.cx0 = d.getAttribute('cx'); d.dataset.cy0 = d.getAttribute('cy'); });
+    function setP(p){
+      ringFg.setAttribute('stroke-dashoffset', (CIRC*(1-p)).toFixed(1));
+      focusDots.forEach(d=>{
+        d.setAttribute('cx', (110 + (parseFloat(d.dataset.cx0)-110)*(1-p)).toFixed(1));
+        d.setAttribute('cy', (110 + (parseFloat(d.dataset.cy0)-110)*(1-p)).toFixed(1));
+        d.style.opacity = 1 - p*0.5;
+      });
+    }
+    function sparks(){
+      if(rmQuery.matches) return;
+      const r = holdBtn.getBoundingClientRect(), cx = r.left + r.width/2, cy = r.top + r.height/2;
+      for(let i=0;i<22;i++){
+        const s = document.createElement('span'); s.className = 'spark';
+        s.style.left = cx + 'px'; s.style.top = cy + 'px';
+        document.body.appendChild(s);
+        const a = Math.random()*Math.PI*2, d = 70 + Math.random()*110;
+        s.animate([{transform:'translate(-50%,-50%) scale(1)',opacity:1},{transform:'translate(calc(-50% + '+Math.cos(a)*d+'px), calc(-50% + '+Math.sin(a)*d+'px)) scale(0)',opacity:0}],{duration:700+Math.random()*400,easing:'cubic-bezier(.2,.8,.2,1)'}).onfinish = ()=>s.remove();
+      }
+    }
+    function tick(now){
+      if(!holding) return;
+      const p = Math.min(1, (now-holdStart)/HOLD_MS);
+      setP(p);
+      if(p >= 1){ holdLabel.textContent = 'Focused'; focusResult.classList.add('shown'); holding = false; sparks(); return; }
+      holdRaf = requestAnimationFrame(tick);
+    }
+    function release(){
+      if(!holding) return;
+      holding = false; if(holdRaf) cancelAnimationFrame(holdRaf);
+      const start = performance.now(), fromP = 1 - parseFloat(ringFg.getAttribute('stroke-dashoffset'))/CIRC;
+      (function back(now){ const t = Math.min(1,(now-start)/500); setP(fromP*(1-t)); if(t<1) requestAnimationFrame(back); else holdLabel.textContent = 'Hold to focus'; })(start);
+    }
+    function begin(e){
+      e.preventDefault();
+      if(rmQuery.matches){ setP(1); holdLabel.textContent='Focused'; focusResult.classList.add('shown'); return; }
+      holding = true; holdStart = performance.now(); holdLabel.textContent = 'Hold\u2026'; focusResult.classList.remove('shown');
+      holdRaf = requestAnimationFrame(tick);
+    }
+    holdBtn.addEventListener('pointerdown', begin);
+    holdBtn.addEventListener('pointerup', release);
+    holdBtn.addEventListener('pointerleave', release);
+    holdBtn.addEventListener('pointercancel', release);
+  })();
   /* ---------- event galleries ---------- */
   const GALLERY = {
+    wuf: [["01",1600,1200],["02",1280,720],["03",1600,1068],["04",1600,1066],["05",1024,684],["06",1024,684],["07",800,534]],
+    fdc: [["01",1600,1068],["02",1600,1068],["03",1600,1068],["04",1600,1068],["05",1600,1068],["06",1066,1600],["07",1600,1068],["08",1600,1068],["09",1600,1068],["10",1600,1068],["11",1600,1068],["12",1600,1068]],
     northcoast: [["01",1600,1200],["02",1600,1200],["03",1600,900],["04",1600,900],["05",1600,1067],["06",1600,1067],["07",1600,1067],["08",1600,1067],["09",1600,1067],["10",1067,1600],["11",1600,1067]],
     worldcup: [["01",1600,1067],["02",1600,1067],["03",1600,1067],["04",1600,1067],["05",1600,1067],["06",1600,1067],["07",1600,1067],["08",1600,1067],["09",1600,1067],["10",1600,1067]],
     bowling: [["01",1600,900],["02",1600,900],["03",1600,900],["04",1600,900],["05",1600,900],["06",1600,900]],
@@ -1002,28 +1925,41 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
     padel: [["01",1600,1067],["02",1600,1067],["03",1600,1067],["04",1600,1067],["05",1600,1067],["06",1600,1067],["07",1600,1066],["08",1600,1067],["09",1600,1067],["10",1600,1067],["11",1600,1067]]
   };
   const EVENTS = {
-    fdc: {
+    wuf: {
+      tag: 'November 2024', title: 'World Urban Forum (WUF12)',
+      story: [
+        'UN-Habitat\u2019s World Urban Forum came to Cairo in 2024 and became the largest edition in the forum\u2019s history, with 37,000+ participants from 182 countries.',
+        'I ran the press conference hall: trained and led 400+ ushers and kept a high-protocol room on schedule, balancing security and media at every session.',
+        'The bar I have held every event to since.'
+      ],
+      meta: ['Cairo', '37,000+ participants', '182 countries', '400+ ushers'],
+      videos: [
+        { src: 'assets/events/wuf/clip-1.mp4', poster: 'assets/events/wuf/clip-1-poster.jpg', label: 'On site, clip 1' },
+        { src: 'assets/events/wuf/clip-2.mp4', poster: 'assets/events/wuf/clip-2-poster.jpg', label: 'On site, clip 2' },
+        { src: 'assets/events/wuf/clip-3.mp4', poster: 'assets/events/wuf/clip-3-poster.jpg', label: 'On site, clip 3', vertical: true }
+      ]
+    },    fdc: {
       tag: '2025 – 2026', title: 'FDC Summit',
       story: [
         'Egypt’s national technology summit, with 300+ speakers, 80+ exhibitors, and 30+ countries represented.',
-        'Starting a year out with a few hundred calls to find the right technology partner, I personally built the system behind it: the registration platform, the website, the mobile app, the exhibitor portal, badging and printing, the manuals, and usher training. I did this as part of a 10-person team delivering the event end to end.',
-        'In 2026 the summit passed 25,000 registrations, double the prior edition, and everything I built ran live for three days.'
+        'I was one of the 10-person team delivering it end to end, from a year out to closing day: sourcing the technology partner, running the whole registration and entry operation, onboarding exhibitors, and training the usher team.',
+        'In 2026 it passed 25,000 registrations, double the last edition, across three live days.'
       ],
       meta: ['25,000+ registrations', '300+ speakers', '80+ exhibitors', '30+ countries']
     },
     northcoast: {
       tag: 'August 2026', title: 'North Coast Tech Retreat',
       story: [
-        'A technology partner event on the North Coast: three days at a beachfront resort, from 27 to 29 August.',
-        'The program mixed talks with real downtime: welcome gifts on arrival, a rooftop dinner at night, and a beach afternoon of volleyball and spikeball.'
+        'Three days at a beachfront resort on the North Coast for a technology partner.',
+        'Talks in the day, real downtime after: welcome gifts on arrival, a rooftop dinner, and an afternoon of beach volleyball and spikeball.'
       ],
       meta: ['27 to 29 August 2026', 'Beachfront resort', 'Talks, dinner, beach']
     },
     worldcup: {
       tag: 'June 2026', title: 'Football Night: Live Screening',
       story: [
-        'A live football night on an open lawn, built around one giant screen.',
-        'Guests watched from beanbags and tables, posed at a trophy photo wall, and played football on the side, all in Egypt red.'
+        'Egypt on one giant screen, partners on an open lawn.',
+        'Beanbags and tables up front, a trophy photo wall to the side, a kickabout behind, and everyone in red.'
       ],
       meta: ['15 June 2026', 'Open-air', 'Photo wall'],
       videos: [
@@ -1033,8 +1969,8 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
     bowling: {
       tag: '2026', title: 'Partner Bowling Day',
       story: [
-        'A bowling and arcade day for a technology partner, from the first roll to the trophies at the end.',
-        'Watch the recap film or the shorter vertical reel, then browse the stills.'
+        'A bowling and arcade day for a technology partner, first roll to final trophy.',
+        'Built to be filmed: a recap for the partner and a vertical cut for social.'
       ],
       meta: ['Bowling and arcade', 'Recap film', 'Vertical reel'],
       videos: [
@@ -1045,8 +1981,8 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
     padel: {
       tag: '2026', title: 'Padel Tournament',
       story: [
-        'A night padel tournament on lit blue courts, from the entrance arch and the first serve to the group photos and the trophies.',
-        'Watch the recap film and the three reels, then browse the photos.'
+        'A night padel tournament on lit blue courts, from the entrance arch and first serve to the group photos and trophies.',
+        'Shot for the feed as much as the room: one recap film and three reels.'
       ],
       meta: ['Tournament', 'Recap film', '3 reels'],
       videos: [
@@ -1059,8 +1995,8 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
     sohour: {
       tag: 'February 2026', title: 'Sohour: Echoes of History',
       story: [
-        'A Ramadan sohour night on 24 February, staged in a historic stone courtyard.',
-        'A live tanoura performance, a full stage program, and a full house of guests, with partner flags lining the way in.'
+        'Ramadan night in a historic stone courtyard.',
+        'A live tanoura, a full stage program and a full house, with partner flags lining the way in.'
       ],
       meta: ['24 February 2026', 'Live tanoura', 'Full house'],
       videos: [
@@ -1070,18 +2006,18 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
     ignite: {
       tag: 'November 2025', title: 'Ignite & Accelerate',
       story: [
-        'The first launch of the Partners fun day, and I was the one piloting it.',
-        'It was a massive success, proving that business talk can happen alongside the thrill of go-karting and a competitive spirit.'
+        'A brand new partner day, and I piloted it from a blank page.',
+        'Business talk in the morning, go-karts in the afternoon. It worked, and the format now has a first edition to build on.'
       ],
       meta: ['6 November 2025', 'New Cairo', 'Partners activation']
     },
     russia: {
       tag: '2025', title: 'Russia Tech Day',
       story: [
-        'My first event ever, and it had everything you need to learn event marketing.',
-        'Multiple brands, each with its own corporate identity, shared one stage, with pods, screens, and a full program running through the day.'
+        'One stage, a lineup of global tech brands, one day.',
+        'Every brand kept its own identity across shared pods and screens, with a full program running from open to close.'
       ],
-      meta: ['2025', 'Multi-brand', 'Pods, stages & screens']
+      meta: ['2025', 'One stage, many brands', 'Pods and screens']
     }
   };
 
