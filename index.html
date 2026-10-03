@@ -988,7 +988,7 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
 
     const renderer = new T.WebGLRenderer({canvas, antialias:true, alpha:true});
     /* start at a modest pixel density; the frame loop lowers it further if frames run slow */
-    let curPR = Math.min(devicePixelRatio || 1, 1.5), slowF = 0, perfF = 0;
+    let curPR = Math.max(1, Math.min(devicePixelRatio || 1, 1.75)), perfT = 0, perfF = 0;
     renderer.setPixelRatio(curPR);
     renderer.outputEncoding = T.sRGBEncoding;
     renderer.toneMapping = T.ACESFilmicToneMapping;
@@ -1032,7 +1032,7 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
     const bodyLookChunk = '#ifdef USE_MAP\n  vec4 tx = texture2D( map, vUv );\n  tx.rgb = min(tx.rgb*2.9, vec3(1.0));\n' + HEAD_LOOK + '\n#endif';
     const texL = new T.TextureLoader();
     const bodyMap = texL.load('assets/models/body-color.png'), bodyNrm = texL.load('assets/models/body-normal.png');
-    [bodyMap, bodyNrm].forEach(tx=>{ tx.flipY = false; tx.wrapS = tx.wrapT = T.RepeatWrapping; tx.anisotropy = 8; });
+    [bodyMap, bodyNrm].forEach(tx=>{ tx.flipY = false; tx.wrapS = tx.wrapT = T.RepeatWrapping; tx.anisotropy = 16; });
     bodyMap.encoding = T.sRGBEncoding;
     const TILE_LEN = 0.72, SNAKE = { uCut: 0.97, len: 12 };
     const skin = new T.MeshPhysicalMaterial({map:bodyMap, normalMap:bodyNrm, normalScale:new T.Vector2(1.3,-1.3), clearcoatNormalMap:bodyNrm, clearcoatNormalScale:new T.Vector2(1.3,-1.3), metalness:1, roughness:0.24, clearcoat:0.9, clearcoatRoughness:0.1, envMapIntensity:1.9});
@@ -1565,7 +1565,8 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
     let last = performance.now(), running = true, raf = null;
     function frame(now){
       const dt = Math.min(0.05, (now-last)/1000); last = now; const t = now/1000;
-      if(headReady){ perfF++; if(dt > 0.026) slowF++; if(perfF >= 90){ if(slowF > 45 && curPR > 0.75){ curPR = Math.max(0.75, curPR - 0.25); renderer.setPixelRatio(curPR); layout(); } perfF = 0; slowF = 0; } }
+      /* only judge speed once the intro has settled, over ~4s of frames, and never drop below full resolution */
+      if(intro.done && !document.hidden){ perfF++; perfT += dt; if(perfF >= 240){ if(perfT/perfF > 0.03 && curPR > 1){ curPR = Math.max(1, curPR - 0.25); renderer.setPixelRatio(curPR); layout(); } perfF = 0; perfT = 0; } }
       plane.constant = -holder.position.z;
       if(pointerIn){ ray.setFromCamera(ndc, camera); if(!ray.ray.intersectPlane(plane, cursorW)) cursorW.set(99,99,99); }
       else cursorW.set(99,99,99);
